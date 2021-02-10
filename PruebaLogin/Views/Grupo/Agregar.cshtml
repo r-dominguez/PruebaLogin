@@ -1,0 +1,69 @@
+﻿@using PruebaLogin.Models;
+@model GrupoCLS
+@{
+    ViewBag.Title = "Agregar";
+    MultiSelectList listaPermiso = (MultiSelectList)ViewBag.listaPermiso;
+}
+
+<h2>Agregar Grupo</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        @using (Html.BeginForm("Agregar", "Grupo", FormMethod.Post, new { @id = "frmAgregarGrupo" }))
+        {
+            <div>
+                @Html.LabelFor(p => p.nombreGrupo)
+                @Html.TextBoxFor(p => p.nombreGrupo, new { @class = "form-control" })
+                @Html.ValidationMessage("nombreGrupo", new { @class = "text-danger" })
+                @if (Model != null && Model.mensajeErrorNombre != null)
+                {
+                    @Html.Label(Model.mensajeErrorNombre, new { @class = "text-danger" })
+                }
+            </div>
+            <div>
+                @Html.Label("Permisos")
+                @Html.ListBox("permisos", listaPermiso, new { @class = "form-control", multiple = "multiple" })
+                @if (Model != null && Model.mensajeErrorPermiso != null)
+                {
+                    @Html.Label(Model.mensajeErrorPermiso, new { @class = "text-danger" })
+                }
+            </div>
+            <div>
+            </div>
+            <div style="padding-top:1em;">
+                <!-- botón que abre modal de confirmación-->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalConfirm">
+                    Guardar
+                </button>
+                @Html.ActionLink("Regresar al listado", "Index", "Grupo", new { @class = "btn btn-danger" })
+            </div>
+        }
+    </div>
+</div>
+
+
+<!-- Modal de confirmación -->
+<div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="modalConfirm" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirma la acción?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div style="padding:1em;">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" onclick="Agregar()" class="btn btn-primary">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function Agregar() {
+        frmAgregarGrupo.submit();
+    }
+</script>
+

@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="BDDemoLoginModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Grupo">
+          <Key>
+            <PropertyRef Name="IDGRUPO" />
+          </Key>
+          <Property Name="IDGRUPO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NOMBREGRUPO" Type="varchar" MaxLength="100" />
+          <Property Name="HABILITADO" Type="int" />
+        </EntityType>
+        <EntityType Name="GrupoPermiso">
+          <Key>
+            <PropertyRef Name="IDGRUPOPERMISO" />
+          </Key>
+          <Property Name="IDGRUPOPERMISO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IDGRUPO" Type="int" />
+          <Property Name="IDPERMISO" Type="int" />
+          <Property Name="HABILITADO" Type="int" />
+        </EntityType>
+        <EntityType Name="Permiso">
+          <Key>
+            <PropertyRef Name="IDPERMISO" />
+          </Key>
+          <Property Name="IDPERMISO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NOMBREPAGINA" Type="varchar" MaxLength="100" />
+          <Property Name="NOMBREACCION" Type="varchar" MaxLength="100" />
+          <Property Name="NOMBRECONTROLADOR" Type="varchar" MaxLength="100" />
+          <Property Name="HABILITADO" Type="int" />
+        </EntityType>
+        <EntityType Name="Usuario">
+          <Key>
+            <PropertyRef Name="IDUSUARIO" />
+          </Key>
+          <Property Name="IDUSUARIO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NOMBREUSUARIO" Type="varchar" MaxLength="100" />
+          <Property Name="CONTRA" Type="varchar" MaxLength="100" />
+          <Property Name="IDGRUPO" Type="int" />
+          <Property Name="HABILITADO" Type="int" />
+        </EntityType>
+        <Association Name="FK__GrupoPerm__IDGRU__2B3F6F97">
+          <End Role="Grupo" Type="Self.Grupo" Multiplicity="0..1" />
+          <End Role="GrupoPermiso" Type="Self.GrupoPermiso" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Grupo">
+              <PropertyRef Name="IDGRUPO" />
+            </Principal>
+            <Dependent Role="GrupoPermiso">
+              <PropertyRef Name="IDGRUPO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__GrupoPerm__IDPER__2C3393D0">
+          <End Role="Permiso" Type="Self.Permiso" Multiplicity="0..1" />
+          <End Role="GrupoPermiso" Type="Self.GrupoPermiso" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Permiso">
+              <PropertyRef Name="IDPERMISO" />
+            </Principal>
+            <Dependent Role="GrupoPermiso">
+              <PropertyRef Name="IDPERMISO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Usuario__IDGRUPO__267ABA7A">
+          <End Role="Grupo" Type="Self.Grupo" Multiplicity="0..1" />
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Grupo">
+              <PropertyRef Name="IDGRUPO" />
+            </Principal>
+            <Dependent Role="Usuario">
+              <PropertyRef Name="IDGRUPO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="BDDemoLoginModelStoreContainer">
+          <EntitySet Name="Grupo" EntityType="Self.Grupo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GrupoPermiso" EntityType="Self.GrupoPermiso" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Permiso" EntityType="Self.Permiso" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__GrupoPerm__IDGRU__2B3F6F97" Association="Self.FK__GrupoPerm__IDGRU__2B3F6F97">
+            <End Role="Grupo" EntitySet="Grupo" />
+            <End Role="GrupoPermiso" EntitySet="GrupoPermiso" />
+          </AssociationSet>
+          <AssociationSet Name="FK__GrupoPerm__IDPER__2C3393D0" Association="Self.FK__GrupoPerm__IDPER__2C3393D0">
+            <End Role="Permiso" EntitySet="Permiso" />
+            <End Role="GrupoPermiso" EntitySet="GrupoPermiso" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Usuario__IDGRUPO__267ABA7A" Association="Self.FK__Usuario__IDGRUPO__267ABA7A">
+            <End Role="Grupo" EntitySet="Grupo" />
+            <End Role="Usuario" EntitySet="Usuario" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="BDDemoLoginModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Grupo">
+          <Key>
+            <PropertyRef Name="IDGRUPO" />
+          </Key>
+          <Property Name="IDGRUPO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NOMBREGRUPO" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="HABILITADO" Type="Int32" />
+          <NavigationProperty Name="GrupoPermiso" Relationship="Self.FK__GrupoPerm__IDGRU__2B3F6F97" FromRole="Grupo" ToRole="GrupoPermiso" />
+          <NavigationProperty Name="Usuario" Relationship="Self.FK__Usuario__IDGRUPO__267ABA7A" FromRole="Grupo" ToRole="Usuario" />
+        </EntityType>
+        <EntityType Name="GrupoPermiso">
+          <Key>
+            <PropertyRef Name="IDGRUPOPERMISO" />
+          </Key>
+          <Property Name="IDGRUPOPERMISO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IDGRUPO" Type="Int32" />
+          <Property Name="IDPERMISO" Type="Int32" />
+          <Property Name="HABILITADO" Type="Int32" />
+          <NavigationProperty Name="Grupo" Relationship="Self.FK__GrupoPerm__IDGRU__2B3F6F97" FromRole="GrupoPermiso" ToRole="Grupo" />
+          <NavigationProperty Name="Permiso" Relationship="Self.FK__GrupoPerm__IDPER__2C3393D0" FromRole="GrupoPermiso" ToRole="Permiso" />
+        </EntityType>
+        <EntityType Name="Permiso">
+          <Key>
+            <PropertyRef Name="IDPERMISO" />
+          </Key>
+          <Property Name="IDPERMISO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NOMBREPAGINA" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="NOMBREACCION" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="NOMBRECONTROLADOR" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="HABILITADO" Type="Int32" />
+          <NavigationProperty Name="GrupoPermiso" Relationship="Self.FK__GrupoPerm__IDPER__2C3393D0" FromRole="Permiso" ToRole="GrupoPermiso" />
+        </EntityType>
+        <EntityType Name="Usuario">
+          <Key>
+            <PropertyRef Name="IDUSUARIO" />
+          </Key>
+          <Property Name="IDUSUARIO" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NOMBREUSUARIO" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="CONTRA" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="IDGRUPO" Type="Int32" />
+          <Property Name="HABILITADO" Type="Int32" />
+          <NavigationProperty Name="Grupo" Relationship="Self.FK__Usuario__IDGRUPO__267ABA7A" FromRole="Usuario" ToRole="Grupo" />
+        </EntityType>
+        <Association Name="FK__GrupoPerm__IDGRU__2B3F6F97">
+          <End Role="Grupo" Type="Self.Grupo" Multiplicity="0..1" />
+          <End Role="GrupoPermiso" Type="Self.GrupoPermiso" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Grupo">
+              <PropertyRef Name="IDGRUPO" />
+            </Principal>
+            <Dependent Role="GrupoPermiso">
+              <PropertyRef Name="IDGRUPO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Usuario__IDGRUPO__267ABA7A">
+          <End Role="Grupo" Type="Self.Grupo" Multiplicity="0..1" />
+          <End Role="Usuario" Type="Self.Usuario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Grupo">
+              <PropertyRef Name="IDGRUPO" />
+            </Principal>
+            <Dependent Role="Usuario">
+              <PropertyRef Name="IDGRUPO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__GrupoPerm__IDPER__2C3393D0">
+          <End Role="Permiso" Type="Self.Permiso" Multiplicity="0..1" />
+          <End Role="GrupoPermiso" Type="Self.GrupoPermiso" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Permiso">
+              <PropertyRef Name="IDPERMISO" />
+            </Principal>
+            <Dependent Role="GrupoPermiso">
+              <PropertyRef Name="IDPERMISO" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="BDDemoLoginEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Grupo" EntityType="Self.Grupo" />
+          <EntitySet Name="GrupoPermiso" EntityType="Self.GrupoPermiso" />
+          <EntitySet Name="Permiso" EntityType="Self.Permiso" />
+          <EntitySet Name="Usuario" EntityType="Self.Usuario" />
+          <AssociationSet Name="FK__GrupoPerm__IDGRU__2B3F6F97" Association="Self.FK__GrupoPerm__IDGRU__2B3F6F97">
+            <End Role="Grupo" EntitySet="Grupo" />
+            <End Role="GrupoPermiso" EntitySet="GrupoPermiso" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Usuario__IDGRUPO__267ABA7A" Association="Self.FK__Usuario__IDGRUPO__267ABA7A">
+            <End Role="Grupo" EntitySet="Grupo" />
+            <End Role="Usuario" EntitySet="Usuario" />
+          </AssociationSet>
+          <AssociationSet Name="FK__GrupoPerm__IDPER__2C3393D0" Association="Self.FK__GrupoPerm__IDPER__2C3393D0">
+            <End Role="Permiso" EntitySet="Permiso" />
+            <End Role="GrupoPermiso" EntitySet="GrupoPermiso" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="BDDemoLoginModelStoreContainer" CdmEntityContainer="BDDemoLoginEntities">
+          <EntitySetMapping Name="Grupo">
+            <EntityTypeMapping TypeName="BDDemoLoginModel.Grupo">
+              <MappingFragment StoreEntitySet="Grupo">
+                <ScalarProperty Name="IDGRUPO" ColumnName="IDGRUPO" />
+                <ScalarProperty Name="NOMBREGRUPO" ColumnName="NOMBREGRUPO" />
+                <ScalarProperty Name="HABILITADO" ColumnName="HABILITADO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GrupoPermiso">
+            <EntityTypeMapping TypeName="BDDemoLoginModel.GrupoPermiso">
+              <MappingFragment StoreEntitySet="GrupoPermiso">
+                <ScalarProperty Name="IDGRUPOPERMISO" ColumnName="IDGRUPOPERMISO" />
+                <ScalarProperty Name="IDGRUPO" ColumnName="IDGRUPO" />
+                <ScalarProperty Name="IDPERMISO" ColumnName="IDPERMISO" />
+                <ScalarProperty Name="HABILITADO" ColumnName="HABILITADO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Permiso">
+            <EntityTypeMapping TypeName="BDDemoLoginModel.Permiso">
+              <MappingFragment StoreEntitySet="Permiso">
+                <ScalarProperty Name="IDPERMISO" ColumnName="IDPERMISO" />
+                <ScalarProperty Name="NOMBREPAGINA" ColumnName="NOMBREPAGINA" />
+                <ScalarProperty Name="NOMBREACCION" ColumnName="NOMBREACCION" />
+                <ScalarProperty Name="NOMBRECONTROLADOR" ColumnName="NOMBRECONTROLADOR" />
+                <ScalarProperty Name="HABILITADO" ColumnName="HABILITADO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Usuario">
+            <EntityTypeMapping TypeName="BDDemoLoginModel.Usuario">
+              <MappingFragment StoreEntitySet="Usuario">
+                <ScalarProperty Name="IDUSUARIO" ColumnName="IDUSUARIO" />
+                <ScalarProperty Name="NOMBREUSUARIO" ColumnName="NOMBREUSUARIO" />
+                <ScalarProperty Name="CONTRA" ColumnName="CONTRA" />
+                <ScalarProperty Name="IDGRUPO" ColumnName="IDGRUPO" />
+                <ScalarProperty Name="HABILITADO" ColumnName="HABILITADO" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

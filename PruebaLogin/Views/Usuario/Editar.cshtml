@@ -1,0 +1,70 @@
+﻿@using PruebaLogin.Models;
+@model UsuarioCLS
+@{
+    ViewBag.Title = "Editar";
+    List<SelectListItem> listaGrupo = (List<SelectListItem>)ViewBag.listaGrupo;
+}
+
+<h2>Editar Usuario</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        @using (Html.BeginForm("Editar", "Usuario", FormMethod.Post, new { @id = "frmEditarUsuario" }))
+        {
+            <div>
+                @Html.LabelFor(p => p.idUsuario)
+                @Html.TextBoxFor(p => p.idUsuario, new { @class = "form-control", @ReadOnly = true })
+                @Html.ValidationMessage("idUsuario", new { @class = "text-danger" })
+            </div>
+            <div>
+                @Html.LabelFor(p => p.nombreUsuario)
+                @Html.TextBoxFor(p => p.nombreUsuario, new { @class = "form-control" })
+                @Html.ValidationMessage("nombreUsuario", new { @class = "text-danger" })
+                @if (Model != null && Model.mensajeError != null)
+                {
+                    @Html.Label(Model.mensajeError, new { @class = "text-danger" })
+                }
+            </div>
+            <div>
+                @Html.LabelFor(p => p.idGrupo)
+                @Html.DropDownList("idGrupo", listaGrupo, null, new { @class = "form-control", })
+                @Html.ValidationMessage("idGrupo", new { @class = "text-danger" })
+            </div>
+            @Html.Hidden("contra")
+            <div style="padding-top:1em;">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalConfirm">
+                    Guardar
+                </button>
+                @Html.ActionLink("Regresar al listado", "Index", "Usuario", new { @class = "btn btn-danger" })
+            </div>
+        }
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirma la acción?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div style="padding:1em;">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" onclick="Agregar()" class="btn btn-primary">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function Agregar() {
+        document.getElementById("contra").value = "123";
+        frmEditarUsuario.submit();
+    }
+</script>
