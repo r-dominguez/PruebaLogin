@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using PruebaLogin.Models;
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -12,14 +13,40 @@
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <div class="navbar-header">
-                @Html.ActionLink("Inicio", "Index", "PaginaInicio", new { area = "" }, new { @class = "navbar-brand" })
-                <a href="" class="navbar-brand">Seguridad</a>
-                @Html.ActionLink("Usuario", "Index", "Usuario", new { area = "" }, new { @class = "navbar-brand" })
-                @Html.ActionLink("Grupo", "Index", "Grupo", new { area = "" }, new { @class = "navbar-brand" })
+            <div class="navbar-header" style=" width: 90%; ">
+                <ul class="nav nav-pills">
+                    <li>@Html.ActionLink("Inicio", "Index", "PaginaInicio", new { area = "" }, new { @class = "navbar-brand" })</li>
+                    <li class="dropdown">
+                        @if ((List<MenuCLS>)Session["Permiso"] != null && (Usuario)Session["Usuario"] != null)
+                        {
+                            <a href="" class="navbar-brand dropdown-toggle" data-toggle="dropdown">Seguridad</a>
+                            <ul class="dropdown-menu">
+                                @foreach (MenuCLS oMenuCLS in (List<MenuCLS>)Session["Permiso"])
+                                {
+                                    if (oMenuCLS.accion == "Index")
+                                    {
+                                        <li>@Html.ActionLink(oMenuCLS.pagina, oMenuCLS.accion, oMenuCLS.controlador, new { area = "" }, new { @class = "navbar-brand " })</li>
+                                    }
+                                }
+                            </ul>
+                        }
+                    </li>
+                    @if ((Usuario)Session["Usuario"] == null)
+                    {
+                        <li style=" position: relative; left: 90%;">@Html.ActionLink("Iniciar Sesión", "Index", "Login", new { area = "" }, new { @class = "navbar-brand" })</li>
+                    }
+                    else
+                    {
+                        <li style=" position: relative; left: 80%;">@Html.ActionLink("Cerrar Sesión", "Logout", "Login", new { area = "" }, new { @class = "navbar-brand" })</li>
+                    }
+
+
+
+                </ul>
             </div>
-        </div>
+        </div>`
     </div>
+
 
     <div class="container body-content">
         @RenderBody()
@@ -30,6 +57,20 @@
     </div>
 
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
     <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/bootstrap-dropdown-hover-master/src/jquery.bootstrap-dropdown-hover.js"></script>
+
+    <script>
+        $.fn.bootstrapDropdownHover({
+            // see next for specifications
+        });
+        $('[data-toggle="dropdown"]').bootstrapDropdownHover({
+            // see next for specifications
+        });
+        $('.navbar [data-toggle="dropdown"]').bootstrapDropdownHover({
+            // see next for specifications
+        });
+    </script>
 </body>
 </html>

@@ -6,9 +6,11 @@ using System.Web;
 using System.Web.Mvc;
 using PruebaLogin.Models;
 using System.Transactions;
+using PruebaLogin.Filter;
 
 namespace PruebaLogin.Controllers
 {
+    [Acceder]
     public class GrupoController : Controller
     {
         // GET: Grupo

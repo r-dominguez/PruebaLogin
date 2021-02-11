@@ -124,6 +124,13 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap.min.css.map" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\.gitignore" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\demo\index-bs3.html" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\demo\index.html" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\dist\jquery.bootstrap-dropdown-hover.js" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\dist\jquery.bootstrap-dropdown-hover.min.js" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\Gruntfile.js" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\src\jquery.bootstrap-dropdown-hover.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -145,6 +152,17 @@
     <Content Include="Content\bootstrap-reboot.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\.editorconfig" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\.jshintrc" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\.travis.yml" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\bootstrap-dropdown-hover.jquery.json" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\bower.json" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\composer.json" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\CONTRIBUTING.md" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\LICENSE.md" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\package-lock.json" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\package.json" />
+    <Content Include="Scripts\bootstrap-dropdown-hover-master\README.md" />
     <None Include="Scripts\jquery-3.0.0-vsdoc.js" />
     <Content Include="Scripts\jquery-3.0.0.js" />
     <Content Include="Scripts\jquery-3.0.0.min.js" />
@@ -158,6 +176,8 @@
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -239,8 +259,10 @@
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\GrupoController.cs" />
+    <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\PaginaInicioController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
+    <Compile Include="Filter\Acceder.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -267,6 +289,7 @@
       <DependentUpon>BDDemoLogin.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\GrupoPermisoCLS.cs" />
+    <Compile Include="Models\MenuCLS.cs" />
     <Compile Include="Models\Permiso.cs">
       <DependentUpon>BDDemoLogin.tt</DependentUpon>
     </Compile>
@@ -308,6 +331,7 @@
     <Content Include="Views\Grupo\Index.cshtml" />
     <Content Include="Views\Grupo\Agregar.cshtml" />
     <Content Include="Views\Grupo\Editar.cshtml" />
+    <Content Include="Views\Login\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

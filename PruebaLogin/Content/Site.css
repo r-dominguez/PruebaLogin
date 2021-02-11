@@ -20,4 +20,13 @@
     color: #b2b2b2;
 }
 
+.navbar-header > li > a:hover, .nav > li > a:focus {
+    text-decoration: none;
+    background-color: transparent;
+}
 
+.dropdown-menu {
+    background-color: #151414 !important;
+    padding-left: 10px !important;
+    border-radius: 3px;
+}
