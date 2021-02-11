@@ -6,9 +6,11 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using PruebaLogin.Models;
+using PruebaLogin.Filter;
 
 namespace PruebaLogin.Controllers
 {
+    [Acceder]
     public class UsuarioController : Controller
     {
         // GET: Usuario 
