@@ -11,16 +11,18 @@
     <script src="~/Scripts/modernizr-2.8.3.js"></script>
 </head>
 <body>
+
+
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <div class="navbar-header" style=" width: 90%; ">
+            <div id='menu-altern'>
                 <ul class="nav nav-pills">
                     <li>@Html.ActionLink("Inicio", "Index", "PaginaInicio", new { area = "" }, new { @class = "navbar-brand" })</li>
-                    <li class="dropdown">
+                    <li class='expandible'>
                         @if ((List<MenuCLS>)Session["Permiso"] != null && (Usuario)Session["Usuario"] != null)
                         {
                             <a href="" class="navbar-brand dropdown-toggle" data-toggle="dropdown">Seguridad</a>
-                            <ul class="dropdown-menu">
+                            <ul>
                                 @foreach (MenuCLS oMenuCLS in (List<MenuCLS>)Session["Permiso"])
                                 {
                                     if (oMenuCLS.accion == "Index")
@@ -33,44 +35,31 @@
                     </li>
                     @if ((Usuario)Session["Usuario"] == null)
                     {
-                        <li style=" position: relative; left: 90%;">@Html.ActionLink("Iniciar Sesión", "Index", "Login", new { area = "" }, new { @class = "navbar-brand" })</li>
+                        <li style=" position: relative; left: 70%;">@Html.ActionLink("Iniciar Sesión", "Index", "Login", new { area = "" }, new { @class = "navbar-brand" })</li>
                     }
                     else
                     {
-                        <li style=" position: relative; left: 80%;">@Html.ActionLink("Cerrar Sesión", "Logout", "Login", new { area = "" }, new { @class = "navbar-brand" })</li>
+                        <li style=" position: relative; left: 70%;">@Html.ActionLink("Cerrar Sesión", "Logout", "Login", new { area = "" }, new { @class = "navbar-brand" })</li>
                     }
-
-
-
                 </ul>
+
             </div>
-        </div>`
+        </div>
     </div>
 
+            <div class="container body-content">
+                @RenderBody()
+                <hr />
+                <footer>
+                    <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+                </footer>
+            </div>
 
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
+            <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+            <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+            <script src="~/Scripts/bootstrap.min.js"></script>
+            <script src="~/Scripts/bootstrap-dropdown-hover-master/src/jquery.bootstrap-dropdown-hover.js"></script>
+            <script src="~/Scripts/MiJavaScript.js"></script>
 
-    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
-    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
-    <script src="~/Scripts/bootstrap.min.js"></script>
-    <script src="~/Scripts/bootstrap-dropdown-hover-master/src/jquery.bootstrap-dropdown-hover.js"></script>
-
-    <script>
-        $.fn.bootstrapDropdownHover({
-            // see next for specifications
-        });
-        $('[data-toggle="dropdown"]').bootstrapDropdownHover({
-            // see next for specifications
-        });
-        $('.navbar [data-toggle="dropdown"]').bootstrapDropdownHover({
-            // see next for specifications
-        });
-    </script>
 </body>
 </html>

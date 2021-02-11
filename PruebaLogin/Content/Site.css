@@ -1,7 +1,7 @@
-﻿body {
+﻿/*body {
     padding-top: 50px;
     padding-bottom: 20px;
-}
+} */
 
 /* Set padding to keep content from hitting the edges */
 .body-content {
@@ -16,9 +16,6 @@
 .navbar-brand{
     color: #ffffff;
 }
-.navbar-brand:hover {
-    color: #b2b2b2;
-}
 
 .navbar-header > li > a:hover, .nav > li > a:focus {
     text-decoration: none;
@@ -30,3 +27,148 @@
     padding-left: 10px !important;
     border-radius: 3px;
 }
+
+
+
+/*    ejemplo para menu*/
+
+.navbar {
+    padding: 1rem 1rem!important;
+}
+
+
+#menu-altern {
+    color: #FFFFFF; /*Color del texto*/
+    width: 100%; /*Ancho del menú--> El número de pestañas principales por el ancho que le demos a cada una(585px) MÁS LOS BORDES (que son 4 de 1px)*/
+    height: 35px; /*Altura del menú*/
+    /*box-shadow: 1px 2px rgba(0,0,0,.3); La sombra del menú*/
+    /*border-radius: 4px; Bordes redondeados al menú*/
+    font-family: "Ubuntu",Trebuchet, Arial, Helvetica, sans-serif; /*La tipografía del texto*/
+    z-index: 999; /*Para que sobresalga por encima de cualquier otro elemento de la página*/
+    text-align: center; /*Para que los links estén centrados*/
+}
+
+    #menu-altern ul {
+        z-index: 999;
+    }
+        /*Anchura y altura de cada link*/
+        #menu-altern ul li {
+            list-style: none; /*Para quitar la viñeta*/
+            display: inline; /*Con el menú finalizado podríamos eliminarlo, pero durante la realización sirvió para que los enlaces fueran uno tras otro en vez de en columnas*/
+            float: left; /*Indispensable, para que se agrupen de derecha a izda*/
+            width: 117px; /*ancho*/
+            height: 35px; /*la misma que la del menu*/
+            line-height: 35px; /*El mismo valor que la altura, para que aparezca centrado verticalmente*/
+            background: #151414; /*Fondo*/
+            cursor: pointer; /*Forma del ratón*/
+            /*border-right: 1px solid #999; Borde derecho*/
+        }
+
+            #menu-altern ul li:first-child { /*El primer elemento li de una lista---> Esto es lo que nos dará problemas con los bordes redondeados*/
+                margin-left: -40px; /*Corregimos posición del menú--->NO NECESARIA SI EN NUESTRO CSS TENEMOS "*{margin:0; padding:0;*/
+                border-bottom-left-radius: 4px; /*bordes redondeados izquierdos*/
+                border-top-left-radius: 4px;
+            }
+
+                #menu-altern ul li:first-child a { /*Los bordes del enlace del li anterior-->Si este mantuviera bordes cuadrados, no dejaría que se vieran los redondeados*/
+                    border-bottom-left-radius: 4px;
+                    border-top-left-radius: 4px;
+                }
+
+            #menu-altern ul li:last-child, #menu-altern ul li:last-child a { /*Los dos pasos anteriores, pero para el último elemento de una lista*/
+                border-bottom-right-radius: 4px;
+                border-top-right-radius: 4px;
+                border-right: 0px; /*hacemos que el último elemento no tenga borde derecho*/
+            }
+
+    #menu-altern .flechaabajo { /*Elemento con forma de flecha jugando con los bordes. Por ahora nos tocará ponerla a mano, ya que no me he parado a desarrollar una función Javascript para insertarla después del texto de cada elemento con clase "expandible"*/
+        display: inline-block; /*Para que se muestre de forma similar a un carácter*/
+        position: relative; /*Nos permite fijar una posición desde la que debiera ser suya original. Además lo anterior se consigue junto con esto*/
+        /*Posición de la flecha*/
+        top: -1px;
+        left: 10px;
+        /*Bordes que le dan esa forma*/
+        border-left: 6px solid transparent;
+        border-top: 6px solid #fff;
+        border-right: 6px solid transparent;
+        border-bottom: 0;
+    }
+
+    #menu-altern ul li a { /*Los enlaces dentro de la lista principal*/
+        display: block; /* Para que mantengan la altura y el ancho de la lista*/
+        text-decoration: none; /*Para que no nos lo subraye ni nada por el estilo*/
+        color: #fff; /*Color del link*/
+        position: relative; /*es prescindible, pero me gusta tenerlo ahí por si después tengo que posicionarlo*/
+    }
+    /*Sublista (submenú)*/
+    #menu-altern ul li ul { /*La lista anidada*/
+        /*No es imprescindible, pero mejor asegurarse de que no nos aparecen sombras raras*/
+        box-shadow: none;
+        border-radius: 0px;
+        /*Corregimos la posición*/
+        position: relative;
+        left: -40px; /*corrección de la posición--->NO NECESARIA SI EN NUESTRO CSS TENEMOS "*{margin:0; padding:0;}"*/
+        width: 117px; /*Anchura-->la misma que la del link y el resto de cosas de antes*/
+        display: none; /*Que no aparezca por defecto*/
+        z-index: 999; /*Que aparezca encima de todo*/
+    }
+
+        #menu-altern ul li ul li { /*Sub-botones*/
+            display: block;
+            box-shadow: 1px 2px rgba(0,0,0,.3); /*Para que haga el efecto de sombra de toda la lista*/
+            float: none; /*Era importante mientras lo desarrollé para que no sigan flotando a la izda. Ahora es prescindible*/
+            position: relative;
+            background: #151414; /*Color de fondo*/
+            z-index: 999; /*Que aparezca encima de todo*/
+        }
+
+            #menu-altern ul li ul li a {
+                color: #ffffff; /*Color de los links*/
+                border: 0px; /*Eliminamos el borde derecho que teníamos puesto*/
+            }
+
+            #menu-altern ul li ul li:first-child, #menu-altern ul li ul li:first-child a { /*Para que no sea afectado por la primera corrección*/
+                margin-left: 0px;
+                border-radius: 0px;
+            }
+
+            #menu-altern ul li ul li:last-child, #menu-altern ul li ul li:last-child a { /*Estilismo para dar borde redondeado al final de la lista*/
+                border-radius: 0px;
+                border-bottom-right-radius: 4px;
+                border-bottom-left-radius: 4px;
+            }
+    /*Estilos página(s) destacadas*/
+    #menu-altern ul li.destacada, #menu-altern ul li.destacada ul li {
+        background: #C00;
+    }
+        /*Efectos hover (cuando pasas el ratón por encima) meramente estilísticos*/
+        #menu-altern ul li.destacada:hover, #menu-altern ul li.destacada ul li:hover {
+            background: #FF1A1A;
+        }
+
+    #menu-altern ul li:hover {
+       /*background: #888;*/ 
+    }
+
+
+
+    /*Antes de esto debemos de haber configurado "#menu-altern ul li ul" con "display:block"*/
+    #menu-altern ul li ul li {
+        display: block;
+        box-shadow: 1px 2px 1px rgba(0,0,0,.3);
+        float: none;
+        position: relative;
+        background: #151414;
+        z-index: 999;
+        overflow: hidden;
+        -moz-transition: all 1s; /*Firefox*/
+        -webkit-transition: all 1s; /*Crome/Safari*/
+        -ms-transition: all 1s; /*IE-->No funciona todavía*/
+        -o-transition: all 1s; /*Opera*/
+        transition: all 1s;
+        opacity: 0;
+    }
+
+    #menu-altern ul li:hover ul li {
+        opacity: 1;
+    }
