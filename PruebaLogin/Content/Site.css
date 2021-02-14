@@ -28,6 +28,12 @@
     border-radius: 3px;
 }
 
+.userName {
+    padding: 0.25em;
+    font-size: 1.25rem;
+    color: cyan;
+}
+
 
 
 /*    ejemplo para menu*/
@@ -172,3 +178,10 @@
     #menu-altern ul li:hover ul li {
         opacity: 1;
     }
+
+.subMenu {
+    width: 200px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    text-align: left;
+}

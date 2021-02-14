@@ -34,6 +34,7 @@
     <EntitySetMapping Name="Usuario">
       <EntityTypeMapping TypeName="BDDemoLoginModel.Usuario">
         <MappingFragment StoreEntitySet="Usuario">
+          <ScalarProperty Name="EMAIL" ColumnName="EMAIL" />
           <ScalarProperty Name="IDUSUARIO" ColumnName="IDUSUARIO" />
           <ScalarProperty Name="NOMBREUSUARIO" ColumnName="NOMBREUSUARIO" />
           <ScalarProperty Name="CONTRA" ColumnName="CONTRA" />

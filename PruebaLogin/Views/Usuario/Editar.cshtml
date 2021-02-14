@@ -3,6 +3,8 @@
 @{
     ViewBag.Title = "Editar";
     List<SelectListItem> listaGrupo = (List<SelectListItem>)ViewBag.listaGrupo;
+
+    string mensajeError = Model.mensajeError;
 }
 
 <h2>Editar Usuario</h2>
@@ -20,16 +22,22 @@
                 @Html.LabelFor(p => p.nombreUsuario)
                 @Html.TextBoxFor(p => p.nombreUsuario, new { @class = "form-control" })
                 @Html.ValidationMessage("nombreUsuario", new { @class = "text-danger" })
-                @if (Model != null && Model.mensajeError != null)
-                {
-                    @Html.Label(Model.mensajeError, new { @class = "text-danger" })
-                }
+            </div>
+            <div>
+                @Html.LabelFor(p => p.email)
+                @Html.TextBoxFor(p => p.email, new { @class = "form-control", })
+                @Html.ValidationMessage("email", new { @class = "text-danger" })
             </div>
             <div>
                 @Html.LabelFor(p => p.idGrupo)
                 @Html.DropDownList("idGrupo", listaGrupo, null, new { @class = "form-control", })
                 @Html.ValidationMessage("idGrupo", new { @class = "text-danger" })
             </div>
+
+            <input id="msjError" type="text" style="visibility:hidden;" value="@mensajeError"/>
+
+            <div id="divError" class="list-group-item-danger"></div>
+
             @Html.Hidden("contra")
             <div style="padding-top:1em;">
                 <!-- Button trigger modal -->
@@ -62,9 +70,14 @@
 </div>
 
 <script>
-
+    if (document.getElementById("msjError").value != "") {
+        console.log(document.getElementById("msjError").value);
+        document.getElementById("divError").innerHTML = document.getElementById("msjError").value;
+    }
+    var frmEditarUsuario = document.getElementById("frmEditarUsuario");
     function Agregar() {
         document.getElementById("contra").value = "123";
         frmEditarUsuario.submit();
     }
+
 </script>

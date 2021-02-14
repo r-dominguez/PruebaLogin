@@ -14,6 +14,7 @@
         <tr>
             <th>@Html.LabelFor(p => Model[0].idUsuario)</th>
             <th>@Html.LabelFor(p => Model[0].nombreUsuario)</th>
+            <th>@Html.LabelFor(p => Model[0].email)</th>
             <th>@Html.LabelFor(p => Model[0].nombreGrupo)</th>
             <th width="9%">Operaciones</th>
         </tr>
@@ -24,6 +25,7 @@
             <tr>
                 <td>@item.idUsuario</td>
                 <td>@item.nombreUsuario</td>
+                <td>@item.email</td>
                 <td>@item.nombreGrupo</td>
                 <td>
                     @Html.ActionLink(" ", "Editar", "Usuario", new { idUs = item.idUsuario }, new { @id = "idusuario", @class = "bi bi-pencil-square  btn btn-primary" })

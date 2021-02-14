@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="BDDemoLoginModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="BDDemoLoginModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Grupo">
           <Key>
             <PropertyRef Name="IDGRUPO" />
@@ -39,6 +39,7 @@
           <Property Name="IDUSUARIO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="NOMBREUSUARIO" Type="varchar" MaxLength="100" />
           <Property Name="CONTRA" Type="varchar" MaxLength="100" />
+          <Property Name="EMAIL" Type="varchar" MaxLength="200" />
           <Property Name="IDGRUPO" Type="int" />
           <Property Name="HABILITADO" Type="int" />
         </EntityType>
@@ -96,8 +97,7 @@
             <End Role="Usuario" EntitySet="Usuario" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="BDDemoLoginModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -143,6 +143,7 @@
           <Property Name="IDGRUPO" Type="Int32" />
           <Property Name="HABILITADO" Type="Int32" />
           <NavigationProperty Name="Grupo" Relationship="Self.FK__Usuario__IDGRUPO__267ABA7A" FromRole="Usuario" ToRole="Grupo" />
+          <Property Name="EMAIL" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK__GrupoPerm__IDGRU__2B3F6F97">
           <End Role="Grupo" Type="Self.Grupo" Multiplicity="0..1" />
@@ -237,6 +238,7 @@
           <EntitySetMapping Name="Usuario">
             <EntityTypeMapping TypeName="BDDemoLoginModel.Usuario">
               <MappingFragment StoreEntitySet="Usuario">
+                <ScalarProperty Name="EMAIL" ColumnName="EMAIL" />
                 <ScalarProperty Name="IDUSUARIO" ColumnName="IDUSUARIO" />
                 <ScalarProperty Name="NOMBREUSUARIO" ColumnName="NOMBREUSUARIO" />
                 <ScalarProperty Name="CONTRA" ColumnName="CONTRA" />

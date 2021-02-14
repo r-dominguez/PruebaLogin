@@ -10,5 +10,6 @@ namespace PruebaLogin.Models
         public string pagina { get; set; }
         public string accion { get; set; }
         public string controlador { get; set; }
+        public string nombreUsuario { get; set; }
     }
 }

@@ -1,0 +1,89 @@
+﻿@using PruebaLogin.Models;
+@model UsuarioCLS
+@{
+    ViewBag.Title = "CambiarContra";
+    string mensajeError = "";
+    if (Model != null)
+    {
+        mensajeError = Model.mensajeError;
+    }
+}
+
+<h2>Cambiar Contraseña</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        @using (Html.BeginForm("CambiarContra", "Usuario", FormMethod.Post, new { id = "frmCambiarContra" }))
+        {
+            <div>
+                @Html.LabelFor(p => p.nombreUsuario)
+                @Html.TextBoxFor(p => p.nombreUsuario, new { @class = "form-control", @ReadOnly = true })
+            </div>
+            <div>
+                @Html.LabelFor(p => p.contra)
+                @Html.PasswordFor(p => p.contra, new { @class = "form-control" })
+                @Html.ValidationMessage("contra", new { @class = "text'danger" })
+            </div>
+            <div>
+                @Html.LabelFor(p => p.nuevaContra)
+                @Html.PasswordFor(p => p.nuevaContra, new { @class = "form-control" })
+                @Html.ValidationMessage("nuevaContra", new { @class = "text'danger" })
+            </div>
+            <div>
+                @Html.LabelFor(p => p.confirmaContra)
+                @Html.PasswordFor(p => p.confirmaContra, new { @class = "form-control" })
+                @Html.ValidationMessage("confirmaContra", new { @class = "text'danger" })
+            </div>
+
+
+            @Html.Hidden("idUsuario")
+            @Html.Hidden("email")
+
+            <input id="msjError" type="text" style="visibility:hidden;" value="@mensajeError" />
+
+            <div id="divError" class="list-group-item-danger"></div>
+
+            <div style="padding-top:1em;">
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalConfirm">
+                    Guardar
+                </button>
+                @Html.ActionLink("Cancelar", "Index", "PaginaInicio","" ,new { @class = "btn btn-danger" })
+
+            </div>
+        }
+    </div>
+
+    <!-- Modal confirmación -->
+    <div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Confirma la acción?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div style="padding:1em;">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" onclick="Guardar()" class="btn btn-primary">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    if (document.getElementById("msjError").value != "") {
+        console.log(document.getElementById("msjError").value);
+        document.getElementById("divError").innerHTML = document.getElementById("msjError").value;
+    }
+
+    var frmCambiarContra = document.getElementById("frmCambiarContra");
+    function Guardar() {
+        document.getElementById("email").value = "pepe@pepe.net";
+        frmCambiarContra.submit();
+    }
+
+</script>

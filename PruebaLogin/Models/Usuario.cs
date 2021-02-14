@@ -19,6 +19,7 @@ namespace PruebaLogin.Models
         public string CONTRA { get; set; }
         public Nullable<int> IDGRUPO { get; set; }
         public Nullable<int> HABILITADO { get; set; }
+        public string EMAIL { get; set; }
     
         public virtual Grupo Grupo { get; set; }
     }

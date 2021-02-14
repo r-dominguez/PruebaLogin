@@ -42,6 +42,7 @@
     <Property Name="IDGRUPO" Type="Int32" />
     <Property Name="HABILITADO" Type="Int32" />
     <NavigationProperty Name="Grupo" Relationship="Self.FK__Usuario__IDGRUPO__267ABA7A" FromRole="Usuario" ToRole="Grupo" />
+    <Property Name="EMAIL" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
   </EntityType>
   <Association Name="FK__GrupoPerm__IDGRU__2B3F6F97">
     <End Role="Grupo" Type="Self.Grupo" Multiplicity="0..1" />

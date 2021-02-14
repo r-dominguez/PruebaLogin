@@ -3,6 +3,12 @@
 @{
     ViewBag.Title = "Agregar";
     List<SelectListItem> listaGrupo = (List<SelectListItem>)ViewBag.listaGrupo;
+    string mensajeError = "";
+    if (Model != null)
+    {
+        mensajeError = Model.mensajeError;
+    }
+
 }
 
 <h2>Agregar Usuario</h2>
@@ -16,10 +22,11 @@
                 @Html.LabelFor(p => p.nombreUsuario)
                 @Html.TextBoxFor(p => p.nombreUsuario, new { @class = "form-control" })
                 @Html.ValidationMessage("nombreUsuario", new { @class = "text-danger" })
-                @if (Model != null && Model.mensajeError != null)
-                {
-                    @Html.Label(Model.mensajeError, new { @class = "text-danger" })
-                }
+            </div>
+            <div>
+                @Html.LabelFor(p => p.email)
+                @Html.TextBoxFor(p => p.email, new { @class = "form-control", })
+                @Html.ValidationMessage("email", new { @class = "text-danger" })
             </div>
             <div>
                 @Html.LabelFor(p => p.contra)
@@ -31,6 +38,11 @@
                 @Html.DropDownList("idGrupo", listaGrupo, null, new { @class = "form-control", })
                 @Html.ValidationMessage("idGrupo", new { @class = "text-danger" })
             </div>
+
+            <input id="msjError" type="text" style="visibility:hidden;" value="@mensajeError" />
+
+            <div id="divError" class="list-group-item-danger"></div>
+
             <div style="padding-top:1em;">
                 <!-- botón que abre el modal de confirmación -->
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalConfirm">
@@ -42,7 +54,7 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal confirmación -->
 <div class="modal fade" id="modalConfirm" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -61,6 +73,11 @@
 </div>
 
 <script>
+    if (document.getElementById("msjError").value != "") {
+        console.log(document.getElementById("msjError").value);
+        document.getElementById("divError").innerHTML = document.getElementById("msjError").value;
+    }
+
     var frmAgregarUsuario = document.getElementById("frmAgregarUsuario");
     frmAgregarUsuario.onsubmit = function (e) {
         e.preventDefault();

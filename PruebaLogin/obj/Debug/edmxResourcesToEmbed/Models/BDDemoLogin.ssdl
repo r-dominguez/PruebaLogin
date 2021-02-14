@@ -34,6 +34,7 @@
     <Property Name="IDUSUARIO" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="NOMBREUSUARIO" Type="varchar" MaxLength="100" />
     <Property Name="CONTRA" Type="varchar" MaxLength="100" />
+    <Property Name="EMAIL" Type="varchar" MaxLength="200" />
     <Property Name="IDGRUPO" Type="int" />
     <Property Name="HABILITADO" Type="int" />
   </EntityType>
