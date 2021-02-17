@@ -16,7 +16,8 @@ namespace PruebaLogin.Filter
 
             string controlador = filterContext.ActionDescriptor.ControllerDescriptor.ControllerName;
             string accion = filterContext.ActionDescriptor.ActionName;
-            int cant = permisos.Where(p => p.accion == accion && p.controlador == controlador).Count();
+           // int cant = permisos.Where(p => p.accion == accion && p.controlador == controlador).Count();
+             int cant = permisos.Where(p => p.controlador == controlador).Count();
 
             if (usuario == null || cant == 0) 
             {

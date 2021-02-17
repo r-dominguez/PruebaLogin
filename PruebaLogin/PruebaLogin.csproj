@@ -316,7 +316,7 @@
     <None Include="packages.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Usuario\Index.cshtml" />
+    <Content Include="Views\Usuario\VC_Index.cshtml" />
     <Content Include="Views\PaginaInicio\Index.cshtml" />
     <Content Include="Views\Usuario\Agregar.cshtml" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
@@ -332,11 +332,15 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Usuario\Editar.cshtml" />
-    <Content Include="Views\Grupo\Index.cshtml" />
+    <Content Include="Views\Grupo\VC_Index.cshtml" />
     <Content Include="Views\Grupo\Agregar.cshtml" />
     <Content Include="Views\Grupo\Editar.cshtml" />
     <Content Include="Views\Login\Index.cshtml" />
     <Content Include="Views\Usuario\CambiarContra.cshtml" />
+    <Content Include="Views\Usuario\Index.cshtml" />
+    <Content Include="Views\Usuario\_TablaUsuario.cshtml" />
+    <Content Include="Views\Grupo\Index.cshtml" />
+    <Content Include="Views\Grupo\_TablaGrupo.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

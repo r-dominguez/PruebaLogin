@@ -17,6 +17,7 @@ namespace PruebaLogin.Controllers
         // GET: Usuario 
         public ActionResult Index()
         {
+            listarComboGrupo();
             List<UsuarioCLS> listaUsuario = new List<UsuarioCLS>();
             using (var bd = new BDDemoLoginEntities())
             {
@@ -35,6 +36,49 @@ namespace PruebaLogin.Controllers
             return View(listaUsuario);
         }
 
+
+
+        public ActionResult Filtrar(UsuarioCLS oUsuarioCLS)
+        {
+            string nomUsuario = oUsuarioCLS.nombreUsuario;
+            List<UsuarioCLS> listaUsuario = new List<UsuarioCLS>();
+            using (var bd = new BDDemoLoginEntities())
+            {
+                if (nomUsuario == null)
+                {
+
+                    listaUsuario = (from usuario in bd.Usuario
+                                    join grupo in bd.Grupo
+                                    on usuario.IDGRUPO equals grupo.IDGRUPO
+                                    where usuario.HABILITADO == 1
+                                    select new UsuarioCLS
+                                    {
+                                        idUsuario = usuario.IDUSUARIO,
+                                        nombreUsuario = usuario.NOMBREUSUARIO,
+                                        email = usuario.EMAIL,
+                                        nombreGrupo = grupo.NOMBREGRUPO
+                                    }).ToList();
+                }else
+                {
+                    listaUsuario = (from usuario in bd.Usuario
+                                    join grupo in bd.Grupo
+                                    on usuario.IDGRUPO equals grupo.IDGRUPO
+                                    where usuario.HABILITADO == 1 
+                                    && usuario.NOMBREUSUARIO.Contains(nomUsuario)
+                                    select new UsuarioCLS
+                                    {
+                                        idUsuario = usuario.IDUSUARIO,
+                                        nombreUsuario = usuario.NOMBREUSUARIO,
+                                        email = usuario.EMAIL,
+                                        nombreGrupo = grupo.NOMBREGRUPO
+                                    }).ToList();
+                }
+            }
+            return PartialView("_TablaUsuario", listaUsuario);
+        }
+
+
+
         public void listarComboGrupo()
         {
             List<SelectListItem> lista;
@@ -52,6 +96,87 @@ namespace PruebaLogin.Controllers
             }
 
         }
+
+
+        public string Guardar(UsuarioCLS oUsuarioCLS, int titulo)
+        {
+            string respuesta = "";
+
+            int numRegistroEncontradosUs = 0;
+            int numRegistroEncontradosEm = 0;
+            try
+            {
+                using (var bd = new BDDemoLoginEntities())
+                {
+                    if (titulo== -1)
+                    {
+                    numRegistroEncontradosUs = bd.Usuario.Where(p => p.NOMBREUSUARIO == oUsuarioCLS.nombreUsuario).Count();
+                    numRegistroEncontradosEm = bd.Usuario.Where(p => p.EMAIL == oUsuarioCLS.email).Count();
+                    }
+                    else
+                    {
+                        numRegistroEncontradosUs = bd.Usuario.Where(p => p.NOMBREUSUARIO == oUsuarioCLS.nombreUsuario && p.IDUSUARIO != titulo).Count();
+                        numRegistroEncontradosEm = bd.Usuario.Where(p => p.EMAIL == oUsuarioCLS.email
+                        && p.IDUSUARIO != titulo).Count();
+                    }
+
+                }
+                if (!ModelState.IsValid || numRegistroEncontradosUs >= 1 || numRegistroEncontradosEm >= 1)
+                {
+                    // revisar errores del modelo 
+                    var query = (from state in ModelState.Values
+                                 from error in state.Errors
+                                 select error.ErrorMessage).ToList();
+                    // concatenar el mensaje de error
+                    respuesta += "<ul class='list-group'>";
+                    foreach (var item in query)
+                    {
+                        respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>" + item + "</li>";
+                    }
+                    if (numRegistroEncontradosUs >= 1) respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>El nombre de usuario ya existe</li>";
+                    if (numRegistroEncontradosEm >= 1) respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>El mail ya existe</li>";
+                    respuesta += "</ul'>";
+                    //
+                }
+                else
+                {
+                    using (var bd = new BDDemoLoginEntities())
+                    {
+                        if (titulo == -1)
+                        {
+                            // guardar
+                            Usuario oUsuario = new Usuario();
+                            oUsuario.NOMBREUSUARIO = oUsuarioCLS.nombreUsuario;
+                            SHA256Managed sha = new SHA256Managed();
+                            byte[] byteContra = Encoding.Default.GetBytes(oUsuarioCLS.contra);
+                            byte[] byteContraCifrada = sha.ComputeHash(byteContra);
+                            string cadenContraCifrada = BitConverter.ToString(byteContraCifrada).Replace("-", "");
+                            oUsuario.CONTRA = cadenContraCifrada;
+                            oUsuario.IDGRUPO = oUsuarioCLS.idGrupo;
+                            oUsuario.EMAIL = oUsuarioCLS.email;
+                            oUsuario.HABILITADO = 1;
+                            bd.Usuario.Add(oUsuario);
+                            respuesta = bd.SaveChanges().ToString();
+                            if (respuesta == "0") respuesta = "";
+                        }
+                        else
+                        {
+                            // editar
+                            Usuario oUsuario = bd.Usuario.Where(p => p.IDUSUARIO == titulo).First();
+                            oUsuario.NOMBREUSUARIO = oUsuarioCLS.nombreUsuario;
+                            oUsuario.EMAIL = oUsuarioCLS.email;
+                            oUsuario.IDGRUPO = oUsuarioCLS.idGrupo;
+                            respuesta = bd.SaveChanges().ToString();
+                        }
+                    }
+                }
+            } catch (Exception ex)
+            {
+                respuesta = "";
+            }
+            return respuesta;
+        }
+
 
         public ActionResult Agregar()
         {
@@ -184,7 +309,7 @@ namespace PruebaLogin.Controllers
         }
 
         [HttpPost]
-        public ActionResult Eliminar(int txtIdUsuario)
+        public ActionResult EliminarSinAjax(int txtIdUsuario)
         {
             using (var bd = new BDDemoLoginEntities())
             {
@@ -193,6 +318,25 @@ namespace PruebaLogin.Controllers
                 bd.SaveChanges();
             }
             return RedirectToAction("Index");
+        }
+
+
+        public string Eliminar(int txtIdUsuario)
+        {
+            string respuesta = "";
+            try
+            {
+                using (var bd = new BDDemoLoginEntities())
+                {
+                    Usuario oUsuario = bd.Usuario.Where(p => p.IDUSUARIO == txtIdUsuario).First();
+                    oUsuario.HABILITADO = 0;
+                    respuesta = bd.SaveChanges().ToString();
+                }
+            }catch(Exception ex)
+            {
+                respuesta = "";
+            }
+            return respuesta;
         }
 
         public ActionResult CambiarContra(int idUser)
@@ -260,6 +404,20 @@ namespace PruebaLogin.Controllers
             }
             Session["Usuario"] = null;
             return RedirectToAction("../Login/Index");
+        }
+
+        public JsonResult RecuperarDatos(int titulo)
+        {
+            UsuarioCLS oUsuarioCLS = new UsuarioCLS();
+            using (var bd = new BDDemoLoginEntities())
+            {
+                Usuario oUsuario = bd.Usuario.Where(p => p.IDUSUARIO == titulo).First();
+                oUsuarioCLS.idUsuario = oUsuario.IDUSUARIO;
+                oUsuarioCLS.nombreUsuario = oUsuario.NOMBREUSUARIO;
+                oUsuarioCLS.email = oUsuario.EMAIL;
+                oUsuarioCLS.idGrupo = (int)oUsuario.IDGRUPO;
+            }
+            return Json(oUsuarioCLS, JsonRequestBehavior.AllowGet);
         }
     }
 }

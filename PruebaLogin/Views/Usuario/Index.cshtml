@@ -2,73 +2,198 @@
 @model  List<UsuarioCLS>
 @{
     ViewBag.Title = "Index";
+    List<SelectListItem> listaGrupo = (List<SelectListItem>)ViewBag.listaGrupo;
 }
 
-<h2>Index Usuarios</h2>
-<div style="padding:1em;">
-    @Html.ActionLink("Nuevo Usuario", "Agregar", "Usuario", new { @class = "btn btn-primary" })
+<h2>Listado de Usuarios</h2>
+
+<!-- Button modal agregar-->
+<div style="padding-top:1em;padding-top:1em;">
+    <button type="button" onclick="Agregar()" class="btn btn-primary" data-toggle="modal" data-target="#modalAgregar">
+        Nuevo Usuario
+    </button>
 </div>
 
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th>@Html.LabelFor(p => Model[0].idUsuario)</th>
-            <th>@Html.LabelFor(p => Model[0].nombreUsuario)</th>
-            <th>@Html.LabelFor(p => Model[0].email)</th>
-            <th>@Html.LabelFor(p => Model[0].nombreGrupo)</th>
-            <th width="9%">Operaciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.idUsuario</td>
-                <td>@item.nombreUsuario</td>
-                <td>@item.email</td>
-                <td>@item.nombreGrupo</td>
-                <td>
-                    @Html.ActionLink(" ", "Editar", "Usuario", new { idUs = item.idUsuario }, new { @id = "idusuario", @class = "bi bi-pencil-square  btn btn-primary" })
-                    <button type="button" onclick="elminar(@item.idUsuario)" class="bi bi-trash btn btn-danger" data-toggle="modal" data-target="#modalConfirmEliminar">
-                    </button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<p>
+    @using (Ajax.BeginForm("Filtrar", "", new AjaxOptions
+    {
+        HttpMethod = "POST",
+        UpdateTargetId = "divUsuario",
+        InsertionMode = InsertionMode.Replace
+    }, new { @id = "frmFiltrado" }))
+    {
+        <div style="padding-bottom:1em; padding-top:1em;">
+            @Html.Label("Filtrar por nombre de Usuario")
+            <input type="text" placeholder="Ingrese un nombre" id="nombreusuario" name="nombreusuario" />
+        </div>
+
+        <div id="divUsuario">
+            @Html.Partial("_TablaUsuario", Model)
+        </div>
+    }
+</p>
 
 
-<!-- Modal confirmación de eliminar registro -->
-<div class="modal fade" id="modalConfirmEliminar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<!-- Modal agregar / editar-->
+<div class="modal fade" id="modalAgregar" tabindex="-1" aria-labelledby="modalAgregar" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Confirma la acción?</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Usuario</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div style="padding:1em;">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" onclick="borrarRegistro()" class="btn btn-primary">Aceptar</button>
+            @using (Ajax.BeginForm("Guardar", "Usuario", null, new AjaxOptions
+            {
+                HttpMethod = "POST",
+                OnSuccess = "Guardar",
+                UpdateTargetId = "divError"
+            }, new { id = "frmAgregarUsuario" }))
+            {
+                @Html.Hidden("titulo")
+                <div class="modal-body">
+                    @Html.Hidden("idUsuario")
+                    <div>
+                        @Html.Label("Nombre Usuario")
+                        @Html.TextBox("nombreUsuario", null, new { @class = "form-control" })
+                    </div>
+                    <div id="divContra">
+                        @Html.Label("Contraseña")
+                        @Html.Password("contra", null, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Email")
+                        @Html.TextBox("email", null, new { @class = "form-control" })
+                    </div>
+                    <div>
+                        @Html.Label("Grupo")
+                        @Html.DropDownList("idGrupo", listaGrupo, null, new { @class = "form-control" })
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnClose" class="btn btn-secondary btn-danger" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            }
+            <div id="divError" style="padding"></div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal confirmación eliminar-->
+<div class="modal fade" id="modalConfirmEliminar" tabindex="-1" aria-labelledby="modalConfirmEliminar" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    ¿Confirma los cambios?
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div style="padding:1em">
+                <button type="button" onclick="EliminarRegistro()" class="btn btn-info" id="aceptar">Aceptar</button>
+                <button type="button" id="btnCerrarConfirmacion" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
             </div>
         </div>
     </div>
 </div>
 
-@using (Html.BeginForm("Eliminar", "Usuario", FormMethod.Post, new { id = "frmEliminarUsuario" }))
-{
-    @Html.Hidden("txtIdUsuario")
-}
+
+<!-- Modal aviso-->
+<div class="modal fade" id="modalAviso" tabindex="-1" aria-labelledby="modalAviso" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div id="contenidoAviso" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalCenterTitle">Aviso</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="descripcionAviso"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <script>
-    function elminar(idUsuario){
-        document.getElementById("txtIdUsuario").value = idUsuario;
+    var frmFiltrado = document.getElementById("frmFiltrado");
+    var nombre = document.getElementById("nombreusuario");
+    nombre.onkeyup = function () {
+        $("#frmFiltrado").trigger("submit");
     }
-    function borrarRegistro() {
-        var frmEliminarUsuario = document.getElementById("frmEliminarUsuario");
-        frmEliminarUsuario.submit();
+
+    function Agregar() {
+        limpiar()
+        document.getElementById("titulo").value = -1;
+    }
+
+    function Editar(id) {
+        limpiar()
+        document.getElementById("titulo").value = id;
+        document.getElementById("divContra").style.display = "none"
+
+        $.get("/Usuario/RecuperarDatos?titulo=" + id, function (data) {
+            document.getElementById("idUsuario").value = "1";
+            document.getElementById("nombreUsuario").value = data.nombreUsuario
+            document.getElementById("contra").value = "1"
+            document.getElementById("email").value = data.email;
+            document.getElementById("idGrupo").value = data.idGrupo;
+        })
+    }
+
+    function Guardar(respuesta) {
+        if (respuesta == "1" || respuesta == "0") {
+            document.getElementById("contenidoAviso").classList = "alert-success modal-content"
+            document.getElementById("descripcionAviso").innerHTML = "EL usuario se guardo correctamente";
+            $('#modalAviso').modal('show');
+            document.getElementById("btnClose").click();
+            $("#frmFiltrado").trigger("submit");
+        } else {
+            document.getElementById("contenidoAviso").classList = "alert-danger  modal-content"
+            document.getElementById("descripcionAviso").innerHTML = "Ocurrio un error, el usuario no se guardo";
+            $('#modalAviso').modal('show');
+        }
+
+    }
+
+    function limpiar() {
+        document.getElementById("divError").innerHTML = "";
+
+        document.getElementById("nombreUsuario").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("idGrupo").value = "";
+    }
+
+    function Eliminar(id) {
+        document.getElementById("titulo").value = id;
+    }
+
+    function EliminarRegistro() {
+        var id = document.getElementById("titulo").value;
+        $.get("/Usuario/Eliminar?txtIdUsuario=" + id, function (data) {
+            if (data == "1") {
+                document.getElementById("contenidoAviso").classList = "alert-success modal-content"
+                document.getElementById("descripcionAviso").innerHTML = "El usuario se elimino correctamente";
+                $('#modalAviso').modal('show');
+                $("#frmFiltrado").trigger("submit");
+                document.getElementById("btnCerrarConfirmacion").click();
+            } else {
+                document.getElementById("contenidoAviso").classList = "alert-danger  modal-content"
+                document.getElementById("descripcionAviso").innerHTML = "Ocurrio un error, el usuario no se elimino";
+                $('#modalAviso').modal('show');
+            }
+        });
     }
 </script>
-

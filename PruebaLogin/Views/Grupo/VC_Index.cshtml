@@ -1,0 +1,70 @@
+﻿@using PruebaLogin.Models;
+@model List<GrupoCLS>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index Grupo</h2>
+<div style="padding:1em;">
+    @Html.ActionLink("Nuevo Grupo", "Agregar", "Grupo", new { @class = "btn btn-primary" })
+</div>
+
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>@Html.LabelFor(p => Model[0].idGrupo)</th>
+            <th>@Html.LabelFor(p => Model[0].nombreGrupo)</th>
+            <th width="9%">Operaciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.idGrupo</td>
+                <td>@item.nombreGrupo</td>
+                <td>
+                    @Html.ActionLink(" ", "Editar", "Grupo", new { idgrupo = item.idGrupo }, new { @id = "idgrupo", @class = "bi bi-pencil-square  btn btn-primary" })
+                    <button type="button" onclick="elminar(@item.idGrupo)" class="bi bi-trash btn btn-danger" data-toggle="modal" data-target="#modalConfirmEliminar">
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal confirmación de eliminar registro -->
+<div class="modal fade" id="modalConfirmEliminar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Confirma la acción?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div style="padding:1em;">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" onclick="borrarRegistro()" class="btn btn-primary">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginForm("Eliminar", "Grupo", FormMethod.Post, new { id = "frmEliminarGrupo" }))
+{
+    @Html.Hidden("txtIdGrupo")
+}
+
+
+<script>
+    function elminar(idGrupo){
+        document.getElementById("txtIdGrupo").value = idGrupo;
+    }
+    function borrarRegistro() {
+        var frmEliminarGrupo = document.getElementById("frmEliminarGrupo");
+        frmEliminarGrupo.submit();
+    }
+</script>
+
