@@ -61,9 +61,104 @@
 </div>
 
 
+<table>
+    <tr>
+        <td>
+            <div style="height:155px;">
+                <select id="origen" multiple="multiple" size="7" style="width: 150px;">
+                    <option value="1">uno</option>
+                </select>
+             </div>
+        </td>
+        <td>
+            <div style=" padding-left: 20px; padding-right: 20px; height: 155px; text-align: center;">
+                <input class="btn btn-primary" style="width: 45px; margin-bottom: 2px;" onclick="AgregarTodosPermisos()" type="button" id="allAdd" value=">>" /><br />
+                <input class="btn btn-primary" style="width: 45px; margin-bottom: 2px;"   onclick="AgregarPermiso()" type="button" id="add" value=">" /><br />
+                <input class="btn btn-danger" style="width: 45px; margin-bottom: 2px;"   onclick="RemoverPermisos()" type="button" id="remove" value="<" /><br />
+                <input class="btn btn-danger" style="width: 45px; margin-bottom: 2px;"   onclick="RemoverTodos()" type="button" id="allRemove" value="<<" />
+            </div>
+        </td>
+        <td>
+            <div style="height:155px;">
+                <select id="destino" multiple="multiple" size="7" style="width: 150px;">
+                    <option value="2">dos</option>
+                    <option value="3">tres</option>
+                    <option value="4">cuatro</option>
+                    <option value="5">cinco</option>
+                    <option value="3">tres</option>
+                    <option value="4">cuatro</option>
+                    <option value="5">cinco</option>
+                </select>
+                </div>
+        </td>
+    </tr>
+</table>
+
+
+
 <script>
-    function Agregar() {
-        frmAgregarGrupo.submit();
+    function AgregarPermiso() {
+        var obj = document.getElementById('origen');
+        if (obj.selectedIndex == -1) {
+            alert('Seleccione una opción');
+        } else {
+            var valor = obj.value;
+            var txt = obj.options[obj.selectedIndex].text;
+            obj.options[obj.selectedIndex] = null;
+            var obj2 = document.getElementById('destino');
+            var opc = new Option(txt, valor);
+            eval(obj2.options[obj2.options.length] = opc);
+        }
+    }
+
+    function AgregarTodosPermisos() {
+        var obj = document.getElementById('origen');
+        var obj2 = document.getElementById('destino');
+        console.log (obj.options.length);
+        for (var i = 0; i < obj.options.length; i+1) {
+            console.log(i);
+            var valor = obj.options[i].value;
+            var txt = obj.options[i].text;
+            obj.options[i] = null;
+            var opc = new Option(txt, valor);
+            eval(obj2.options[obj2.options.length] = opc);
+        }
+    }
+
+    function RemoverPermisos() {
+        var obj = document.getElementById('destino');
+        if (obj.selectedIndex == -1) {
+            alert('Seleccione Una opción');
+        } else {
+            var valor = obj.value;
+            var txt = obj.options[obj.selectedIndex].text;
+            obj.options[obj.selectedIndex] = null;
+            var obj2 = document.getElementById('origen');
+            var opc = new Option(txt, valor);
+            eval(obj2.options[obj2.options.length] = opc);
+        }
+    }
+
+    function RemoverTodos() {
+        var obj = document.getElementById('destino');
+        var obj2 = document.getElementById('origen');
+        console.log(obj.options.length);
+        for (var i = 0; i < obj.options.length; i + 1) {
+            console.log(i);
+            var valor = obj.options[i].value;
+            var txt = obj.options[i].text;
+            obj.options[i] = null;
+            var opc = new Option(txt, valor);
+            eval(obj2.options[obj2.options.length] = opc);
+        }
+    }
+
+</script>
+
+
+<script>
+            function Agregar() {
+                frmAgregarGrupo.submit();
     }
 </script>
 
