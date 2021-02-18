@@ -545,5 +545,11 @@ namespace PruebaLogin.Controllers
         }
 
 
+        public ActionResult graficaGrupo()
+        {
+            return View();
+        }
+
+
     }
 }

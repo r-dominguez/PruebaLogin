@@ -55,7 +55,7 @@
                 {
                     @Html.Hidden("titulo")
                     <div class="modal-body">
-                        @Html.Hidden("idUsuario")
+                        @*Html.Hidden("idUsuario")*@
                         <div>
                             @Html.Label("Nombre Usuario")
                             @Html.TextBox("nombreUsuario", null, new { @class = "form-control" })
@@ -138,15 +138,18 @@
         function Agregar() {
             limpiar()
             document.getElementById("titulo").value = -1;
+            document.getElementById("contra").value = "";
+            console.log("hola " + document.getElementById("contra").value + "-");
+            document.getElementById("divContra").style.display = "block";
         }
 
         function Editar(id) {
             limpiar()
             document.getElementById("titulo").value = id;
-            document.getElementById("divContra").style.display = "none"
+            document.getElementById("divContra").style.display = "none";
 
             $.get("/Usuario/RecuperarDatos?titulo=" + id, function (data) {
-                document.getElementById("idUsuario").value = "1";
+                //document.getElementById("idUsuario").value = "1";
                 document.getElementById("nombreUsuario").value = data.nombreUsuario
                 document.getElementById("contra").value = "1"
                 document.getElementById("email").value = data.email;

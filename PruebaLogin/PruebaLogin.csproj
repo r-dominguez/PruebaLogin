@@ -715,7 +715,6 @@
     <Content Include="Views\Usuario\_TablaUsuario.cshtml" />
     <Content Include="Views\Grupo\Index.cshtml" />
     <Content Include="Views\Grupo\_TablaGrupo.cshtml" />
-    <Content Include="Views\Grupo\graficaGrupo.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
