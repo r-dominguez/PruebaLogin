@@ -221,59 +221,6 @@ namespace PruebaLogin.Controllers
             return lista;
         }
 
-        // GET: Grupo 
-        public ActionResult IndexSinPaginador()
-        {
-            List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                listaGrupo = (from grupo in bd.Grupo
-                              where grupo.HABILITADO == 1
-                              select new GrupoCLS
-                              {
-                                  idGrupo = grupo.IDGRUPO,
-                                  nombreGrupo = grupo.NOMBREGRUPO
-                              }).ToList();
-            Session["listaGrupo"] = listaGrupo;
-            }
-            return View(listaGrupo);
-        }
-
-
-        public ActionResult FiltrarSinPaginador(GrupoCLS oGrupoCLS)
-        {
-            string nomGrupo = oGrupoCLS.nombreGrupo;
-            List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                if (nomGrupo == null)
-                {
-                    listaGrupo = (from grupo in bd.Grupo
-                                  where grupo.HABILITADO == 1
-                                  select new GrupoCLS
-                                  {
-                                      idGrupo = grupo.IDGRUPO,
-                                      nombreGrupo = grupo.NOMBREGRUPO
-                                  }).ToList();
-                Session["listaGrupo"] = listaGrupo;
-                }
-                else
-                {
-                    listaGrupo = (from grupo in bd.Grupo
-                                  where grupo.HABILITADO == 1
-                                  && grupo.NOMBREGRUPO.Contains(nomGrupo)
-                                  select new GrupoCLS
-                                  {
-                                      idGrupo = grupo.IDGRUPO,
-                                      nombreGrupo = grupo.NOMBREGRUPO
-                                  }).ToList();
-
-                    Session["listaGrupo"] = listaGrupo;
-                }
-            }
-            return PartialView("_TablaGrupo", listaGrupo);
-        }
-
         public string Guardar(GrupoCLS oGrupoCLS, int titulo, FormCollection form)
         {
             string respuesta = "";
@@ -390,75 +337,6 @@ namespace PruebaLogin.Controllers
             }
         }
 
-        public ActionResult Agregar()
-        {
-            return View();
-        }
-
-
-        [HttpPost]
-        public ActionResult Agregar(GrupoCLS oGrupoCLS, FormCollection form)
-        {
-            string[] permisosSeleccionados = null;
-            if (form["permisos"] != null)
-            {
-            permisosSeleccionados = form["permisos"].Split(',');
-            }
-
-            int numPermisosSeleccionados = 0;
-            if (permisosSeleccionados != null)numPermisosSeleccionados = permisosSeleccionados.Count();
-
-            int numRegistrosEncontrados = 0;
-            using (var bd = new BDDemoLoginEntities())
-            {
-                numRegistrosEncontrados = bd.Grupo.Where(p => p.NOMBREGRUPO == oGrupoCLS.nombreGrupo).Count();
-            }
-            if (!ModelState.IsValid || numRegistrosEncontrados >= 1 || numPermisosSeleccionados<1)
-            {
-                if (numRegistrosEncontrados >= 1) oGrupoCLS.mensajeErrorNombre = "El nombre de grupo ya existe ";
-                if (numPermisosSeleccionados < 1) oGrupoCLS.mensajeErrorPermiso = "Debe Seleccionar por lo menos un permiso";
-                return View(oGrupoCLS);
-            }
-            else
-            {
-                using (var bd = new BDDemoLoginEntities()) 
-                {
-                    using (var transaccion = new System.Transactions.TransactionScope()) { 
-                        Grupo oGrupo = new Grupo();
-                        oGrupo.NOMBREGRUPO = oGrupoCLS.nombreGrupo;
-                        oGrupo.HABILITADO = 1;
-                        bd.Grupo.Add(oGrupo);
-
-                    for (int i=0; i < numPermisosSeleccionados;i++)
-                    {
-                        GrupoPermiso oGrupoPermiso = new GrupoPermiso();
-                        oGrupoPermiso.IDGRUPO = oGrupoCLS.idGrupo;
-                        oGrupoPermiso.IDPERMISO = int.Parse(permisosSeleccionados[i]);
-                        oGrupoPermiso.HABILITADO = 1;
-                        bd.GrupoPermiso.Add(oGrupoPermiso);
-                    }
-                    bd.SaveChanges();
-                    transaccion.Complete();
-                    }
-                            
-                }
-            }
-            return RedirectToAction("Index");
-        }
-
-        public ActionResult Editar(int idgrupo)
-        {
-            GrupoCLS oGrupoCLS = new GrupoCLS();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                Grupo oGrupo = bd.Grupo.Where(p => p.IDGRUPO == idgrupo).First();
-                oGrupoCLS.idGrupo = oGrupo.IDGRUPO;
-                oGrupoCLS.nombreGrupo = oGrupo.NOMBREGRUPO;
-            }
-            listarPermisoSelecionados(listaPermisosGrupo(idgrupo));
-            return View(oGrupoCLS);
-        }
-
         // recupero los permisos de un grupo 
         public List<GrupoPermisoCLS> listaPermisosGrupo(int idgrupo)
         {
@@ -478,66 +356,6 @@ namespace PruebaLogin.Controllers
             }
             return (lista);
         }
-
-
-        [HttpPost]
-        public ActionResult Editar(GrupoCLS oGrupoCLS, FormCollection form) 
-        {
-            string[] permisosSeleccionados = null;
-            if (form["permisos"] != null)
-            {
-                permisosSeleccionados = form["permisos"].Split(',');
-            }
-
-            int numPermisosSeleccionados = 0;
-            if (permisosSeleccionados != null) numPermisosSeleccionados = permisosSeleccionados.Count();
-
-            //try
-            //{
-            int numRegistrosEncontrados = 0;
-            using (var bd = new BDDemoLoginEntities())
-            {
-                numRegistrosEncontrados = bd.Grupo.Where(p => p.NOMBREGRUPO == oGrupoCLS.nombreGrupo
-                                                            && p.IDGRUPO!=oGrupoCLS.idGrupo).Count();
-            }
-            if (!ModelState.IsValid || numRegistrosEncontrados >= 1 || numPermisosSeleccionados < 1)
-            {
-                if (numRegistrosEncontrados >= 1) oGrupoCLS.mensajeErrorNombre = "El nombre de grupo ya existe ";
-                if (numPermisosSeleccionados < 1) oGrupoCLS.mensajeErrorPermiso = "Debe Seleccionar por lo menos un permiso";
-                listarPermisoSelecionados(listaPermisosGrupo(oGrupoCLS.idGrupo));
-                return View(oGrupoCLS);
-            }
-            else
-            {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    using (var transaccion = new System.Transactions.TransactionScope())
-                    {
-                        Grupo oGrupo = bd.Grupo.Where(p => p.IDGRUPO == oGrupoCLS.idGrupo).First();
-                        oGrupo.NOMBREGRUPO = oGrupoCLS.nombreGrupo;
-
-                        // borra permisos existentes
-                        bd.GrupoPermiso.RemoveRange(bd.GrupoPermiso.Where(p => p.IDGRUPO == oGrupoCLS.idGrupo));
-
-                        // agregar nuevos permisos
-
-                        for (int i = 0; i < numPermisosSeleccionados; i++)
-                        {
-                            GrupoPermiso oGrupoPermiso = new GrupoPermiso();
-                            oGrupoPermiso.IDGRUPO = oGrupoCLS.idGrupo;
-                            oGrupoPermiso.IDPERMISO = int.Parse(permisosSeleccionados[i]);
-                            oGrupoPermiso.HABILITADO = 1;
-                            bd.GrupoPermiso.Add(oGrupoPermiso);
-                        }
-                        bd.SaveChanges();
-                        transaccion.Complete();
-                    }
-
-                }
-            }
-            return RedirectToAction("Index");
-        }
-
 
         public String Eliminar(int? txtIdGrupo)
         {
@@ -568,33 +386,6 @@ namespace PruebaLogin.Controllers
             }
             return respuesta;
         }
-
-
-        [HttpPost]
-        public ActionResult EliminarSinAjax(int? txtIdGrupo)
-        {
-            using (var bd = new BDDemoLoginEntities())
-            {
-                using (var transaccion = new System.Transactions.TransactionScope()) 
-                { 
-                    Grupo oGrupo = bd.Grupo.Where(p => p.IDGRUPO == txtIdGrupo).First();
-                    oGrupo.HABILITADO = 0;
-
-                    // borra permisos existentes
-                    int cantPermisos = bd.GrupoPermiso.Where(p=>p.IDGRUPO == txtIdGrupo).Count();
-
-                    for (int i = 0; i < cantPermisos; i++)
-                    {
-                        GrupoPermiso oGrupoPermiso = bd.GrupoPermiso.Where(p => p.IDGRUPO == txtIdGrupo).First();
-                        oGrupoPermiso.HABILITADO = 0;
-                    }
-                    bd.SaveChanges();
-                    transaccion.Complete();
-                }
-            }
-            return RedirectToAction("Index");
-        }
-
 
         public JsonResult RecuperarDatosGrupo(int titulo)
         {
