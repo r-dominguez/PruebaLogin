@@ -73,7 +73,7 @@ namespace PruebaLogin.Controllers
 
 
         // GET: Grupo
-        public ActionResult Index(int pagina = 1)
+        public ActionResult IndexConPaginadoMal(int pagina = 1)
         {
             List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
 
@@ -114,7 +114,7 @@ namespace PruebaLogin.Controllers
             return View(_PaginadorGrupos);
         }
 
-        public ActionResult Filtrar(string nombregrupo, int pagina = 1)
+        public ActionResult FiltrarConPaginadoMal(string nombregrupo, int pagina = 1)
         {
            string nomGrupo = nombregrupo;
             List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
@@ -222,7 +222,7 @@ namespace PruebaLogin.Controllers
         }
 
         // GET: Grupo
-        public ActionResult IndexSinPaginado(int? page)
+        public ActionResult Index()
         {
             List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
             using (var bd = new BDDemoLoginEntities())
@@ -236,14 +236,11 @@ namespace PruebaLogin.Controllers
                               }).ToList();
             Session["listaGrupo"] = listaGrupo;
             }
-            int pageSize = 5;
-            // si page es null le asigna 1 a pageNumber
-            int pageNumber = page ?? 1;
-            return View(listaGrupo.ToPagedList(pageNumber, pageSize));
+            return View(listaGrupo);
         }
 
 
-        public ActionResult FiltrarSinpaginado(GrupoCLS oGrupoCLS)
+        public ActionResult Filtrar(GrupoCLS oGrupoCLS)
         {
             string nomGrupo = oGrupoCLS.nombreGrupo;
             List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
