@@ -1,6 +1,5 @@
 ﻿@using PruebaLogin.Models;
-@using PruebaLogin.ClasesAuxiliares;
-@model  PaginadorGenerico<GrupoCLS>
+@model  List<GrupoCLS>
 @{
     ViewBag.Title = "Index";
     //MultiSelectList listaPermiso = (MultiSelectList)ViewBag.listaPermiso;
@@ -12,7 +11,7 @@
     <button type="button" onclick="Agregar()" class="btn btn-primary" data-toggle="modal" data-target="#modalAgregar">
         Nuevo Grupo
     </button>
-    @Html.ActionLink(" Listado PDF", "generarPDF", "Grupo", null, new { @class = "btn btn-primary bi bi-download  disabled", @target = "_blank" })
+    @Html.ActionLink(" Listado PDF", "generarPDF", "Grupo", null, new { @class = "btn btn-primary bi bi-download", @target = "_blank" })
     @Html.ActionLink(" Listado XSLX", "generarExcel", "Grupo", null, new { @class = "btn btn-primary bi bi-download", @target = "_blank" })
 </div>
 
@@ -25,7 +24,7 @@
         InsertionMode = InsertionMode.Replace
     }, new { @id = "frmFiltradoGrupo" }))
     {
-
+        
         <div style="padding-bottom:1em; padding-top:1em;">
             @Html.Label("Filtrar por nombre de Grupo")
             <input type="text" placeholder="Ingrese un nombre" id="nombregrupo" name="nombregrupo" />
@@ -44,7 +43,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="agregarEditar">Agregar Grupo</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Agregar Usuario</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -154,7 +153,6 @@
     }
 
     function Agregar() {
-        document.getElementById("agregarEditar").innerHTML="Agregar Grupo"
         limpiarPermisos();
         limpiar();
         //recuperar lista de permisos completa
@@ -169,7 +167,6 @@
     }
 
     function Editar(id) {
-        document.getElementById("agregarEditar").innerHTML = "Editar Grupo"
         limpiar();
         limpiarPermisos();
         document.getElementById("titulo").value = id;
@@ -234,13 +231,13 @@
         $.get("/Grupo/Eliminar?txtIdGrupo=" + id, function (data) {
             if (data == "999") {
                 document.getElementById("contenidoAviso").classList = "alert-success modal-content"
-                document.getElementById("descripcionAviso").innerHTML = "El grupo se elimino correctamente";
+                document.getElementById("descripcionAviso").innerHTML = "El usuario se elimino correctamente";
                 $('#modalAviso').modal('show');
                 $("#frmFiltradoGrupo").trigger("submit");
                 document.getElementById("btnCerrarConfirmacion").click();
             } else {
                 document.getElementById("contenidoAviso").classList = "alert-danger  modal-content"
-                document.getElementById("descripcionAviso").innerHTML = "Ocurrio un error, el grupo no se elimino";
+                document.getElementById("descripcionAviso").innerHTML = "Ocurrio un error, el usuario no se elimino";
                 $('#modalAviso').modal('show');
             }
         });

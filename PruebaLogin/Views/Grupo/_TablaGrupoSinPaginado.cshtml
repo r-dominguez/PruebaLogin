@@ -1,0 +1,29 @@
+﻿@using PruebaLogin.Models;
+@model  List<GrupoCLS>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>@Html.LabelFor(p => Model[0].idGrupo)</th>
+            <th>@Html.LabelFor(p => Model[0].nombreGrupo)</th>
+            <th width="9%">Operaciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.idGrupo</td>
+                <td>@item.nombreGrupo</td>
+                <td>
+                    <button type="button" onclick="Editar(@item.idGrupo)" class="bi bi-pencil-square  btn btn-primary" data-toggle="modal" data-target="#modalAgregar">
+                    </button>
+                    <button type="button" onclick="Eliminar(@item.idGrupo)" class="bi bi-trash btn btn-danger" data-toggle="modal" data-target="#modalConfirmEliminar">
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

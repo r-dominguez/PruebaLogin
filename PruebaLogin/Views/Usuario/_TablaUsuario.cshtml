@@ -66,12 +66,12 @@ else
 {
     @Ajax.ActionLink("<<", "Filtrar", new { pagina = 1, nombreusuario = "nu" },
                                          new AjaxOptions { UpdateTargetId = "divUsuario" },
-                                         new { @class = "btn btn-sm btn-default", id = "atras3" })
+                                         new { @class = "btn btn-sm btn-default disabled", id = "atras3" })
     <span>
     </span>
     @Ajax.ActionLink("Anterior", "Filtrar", new { pagina = 1, nombreusuario = "nu" },
                                          new AjaxOptions { UpdateTargetId = "divUsuario" },
-                                         new { @class = "btn btn-sm btn-default", id = "atras4" })
+                                         new { @class = "btn btn-sm btn-default disabled", id = "atras4" })
 }
 <span>
 </span>
@@ -90,12 +90,12 @@ else
 {
     @Ajax.ActionLink("Siguiente", "Filtrar", new { pagina = Model.TotalPaginas - 1, nombreusuario = "nu" },
                                      new AjaxOptions { UpdateTargetId = "divUsuario" },
-                                     new { @class = "btn btn-sm btn-default", id = "adelante3" })
+                                     new { @class = "btn btn-sm btn-default disabled", id = "adelante3" })
     <span>
     </span>
     @Ajax.ActionLink(">>", "Filtrar", new { pagina = Model.TotalPaginas, nombreusuario = "nu" },
                                      new AjaxOptions { UpdateTargetId = "divUsuario" },
-                                     new { @class = "btn btn-sm btn-default", id = "adelante4" })
+                                     new { @class = "btn btn-sm btn-default disabled", id = "adelante4" })
 }
 
 <script>

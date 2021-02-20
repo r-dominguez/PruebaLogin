@@ -1,16 +1,17 @@
 ﻿@using PruebaLogin.Models;
-@model  List<GrupoCLS>
+@using PruebaLogin.ClasesAuxiliares;
+@model  PaginadorGenerico<GrupoCLS>
 
 <table class="table table-bordered table-hover">
     <thead>
         <tr>
-            <th>@Html.LabelFor(p => Model[0].idGrupo)</th>
-            <th>@Html.LabelFor(p => Model[0].nombreGrupo)</th>
+            <th>@Html.Label("Id Grupo")</th>
+            <th>@Html.Label("Nombre Grupo")</th>
             <th width="9%">Operaciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.Resultado)
         {
             <tr>
                 <td>@item.idGrupo</td>
@@ -27,3 +28,114 @@
 </table>
 
 
+<!--paginador del listado -->
+
+@if (Model.Resultado.Count() > 0)
+{
+    <span>
+        <strong>@Model.TotalRegistros</strong> registros encontrados
+    </span>
+    <span>&nbsp;|&nbsp;</span>
+    <span>
+        Página <strong>@(Model.PaginaActual)</strong> de
+        <strong>@Model.TotalPaginas</strong>
+    </span>
+    <span>&nbsp;|&nbsp;</span>
+}
+else
+{
+    <span>No hay resultados para esta búsqueda</span>
+    <span>&nbsp;|&nbsp;</span>
+}
+
+@if (Model.PaginaActual > 1)
+{
+    @Ajax.ActionLink("<<", "Filtrar", new { pagina = 1, nombregrupo = "nu" },
+                                         new AjaxOptions { UpdateTargetId = "divGrupo" },
+                                         new { @class = "btn btn-sm btn-default", id = "atras1" })
+    <span>
+    </span>
+    @Ajax.ActionLink("Anterior", "Filtrar", new { pagina = Model.PaginaActual - 1, nombregrupo = "nu" },
+                                         new AjaxOptions { UpdateTargetId = "divGrupo" },
+                                         new { @class = "btn btn-sm btn-default", id = "atras2" })
+}
+else
+{
+    @Ajax.ActionLink("<<", "Filtrar", new { pagina = 1, nombregrupo = "nu" },
+                                         new AjaxOptions { UpdateTargetId = "divGrupo" },
+                                         new { @class = "btn btn-sm btn-default disabled", id = "atras3" })
+    <span>
+    </span>
+    @Ajax.ActionLink("Anterior", "Filtrar", new { pagina = 1, nombregrupo = "nu" },
+                                         new AjaxOptions { UpdateTargetId = "divUsuario" },
+                                         new { @class = "btn btn-sm btn-default disabled", id = "atras4" })
+}
+<span>
+</span>
+@if (Model.PaginaActual < Model.TotalPaginas)
+{
+    @Ajax.ActionLink("Siguiente", "Filtrar", new { pagina = Model.PaginaActual + 1, nombregrupo = "nu" },
+                                             new AjaxOptions { UpdateTargetId = "divGrupo" },
+                                             new { @class = "btn btn-sm btn-default", id = "adelante1" })
+    <span>
+    </span>
+    @Ajax.ActionLink(">>", "Filtrar", new { pagina = Model.TotalPaginas, nombregrupo = "nu" },
+                                     new AjaxOptions { UpdateTargetId = "divGrupo" },
+                                     new { @class = "btn btn-sm btn-default", id = "adelante2" })
+}
+else
+{
+    @Ajax.ActionLink("Siguiente", "Filtrar", new { pagina = Model.TotalPaginas - 1, nombregrupo = "nu" },
+                                     new AjaxOptions { UpdateTargetId = "divGrupo" },
+                                     new { @class = "btn btn-sm btn-default disabled", id = "adelante3" })
+    <span>
+    </span>
+    @Ajax.ActionLink(">>", "Filtrar", new { pagina = Model.TotalPaginas, nombregrupo = "nu" },
+                                     new AjaxOptions { UpdateTargetId = "divGrupo" },
+                                     new { @class = "btn btn-sm btn-default disabled", id = "adelante4" })
+}
+
+<script>
+    $("#atras1").click(function () {
+        var nom = document.getElementById("nombregrupo").value;
+        console.log(nom);
+        $("#atras1").attr('href', $("#atras1").attr('href').replace("nu", nom))
+    });
+    $("#atras2").click(function () {
+        var nom = document.getElementById("nombregrupo").value;
+        console.log(nom);
+        $("#atras2").attr('href', $("#atras2").attr('href').replace("nu", nom))
+    });
+    $("#atras3").click(function () {
+        var nom = document.getElementById("nombregrupo").value;
+        console.log(nom);
+        $("#atras3").attr('href', $("#atras3").attr('href').replace("nu", nom))
+    });
+    $("#atras4").click(function () {
+        var nom = document.getElementById("nombregrupo").value;
+        console.log(nom);
+        $("#atras4").attr('href', $("#atras4").attr('href').replace("nu", nom))
+    });
+
+
+    $("#adelante1").click(function () {
+        var nom = document.getElementById("nombregrupo").value;
+        console.log(nom);
+        $("#adelante1").attr('href', $("#adelante1").attr('href').replace("nu", nom))
+    });
+    $("#adelante2").click(function () {
+        var nom = document.getElementById("nombregrupo").value;
+        console.log(nom);
+        $("#adelante2").attr('href', $("#adelante2").attr('href').replace("nu", nom))
+    });
+    $("#adelante3").click(function () {
+        var nom = document.getElementById("nombregrupo").value;
+        console.log(nom);
+        $("#adelante3").attr('href', $("#adelante3").attr('href').replace("nu", nom))
+    });
+    $("#adelante4").click(function () {
+        var nom = document.getElementById("nombregrupo").value;
+        console.log(nom);
+        $("#adelante4").attr('href', $("#adelante4").attr('href').replace("nu", nom))
+    });
+</script>
