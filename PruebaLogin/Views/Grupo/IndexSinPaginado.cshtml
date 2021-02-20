@@ -1,6 +1,6 @@
 ﻿@using PruebaLogin.Models;
-@using PruebaLogin.ClasesAuxiliares;
-@model  PaginadorGenerico<GrupoCLS>
+@using PagedList.Mvc;
+@model  PagedList.IPagedList<GrupoCLS>
 @{
     ViewBag.Title = "Index";
     //MultiSelectList listaPermiso = (MultiSelectList)ViewBag.listaPermiso;
@@ -17,23 +17,25 @@
 </div>
 
 <p>
-    @using (Ajax.BeginForm("Filtrar", "", new AjaxOptions
+    <!-- Formulario filtar por nombre grupo -->
+    @using (Ajax.BeginForm("Filtrar", "Grupo", new AjaxOptions
     {
         HttpMethod = "POST",
         UpdateTargetId = "divGrupo",
         InsertionMode = InsertionMode.Replace
-    }, new { id = "frmFiltrado" }))
+    }, new { @id = "frmFiltrado" }))
     {
+        <!--
         <div style="padding-bottom:1em; padding-top:1em;">
-             @Html.Label("Filtrar por nombre de Grupo")
+            @*Html.Label("Filtrar por nombre de Grupo")*@
             <input type="text" placeholder="Ingrese un nombre" id="nombregrupo" name="nombregrupo" />
-        </div>
+        </div>-->
         <div id="divGrupo">
             @Html.Partial("_TablaGrupo", Model)
         </div>
-
     }
 </p>
+
 
 
 
@@ -57,6 +59,7 @@
             {
                 @Html.Hidden("titulo")
                 <div class="modal-body">
+                    @Html.Hidden("page")
                     @Html.Hidden("idGrupo")
                     <div>
                         @Html.Label("Nombre Grupo")
@@ -99,7 +102,7 @@
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             }
-            <div id="divError" style="padding:1em;"></div>
+            <div id="divError" style="padding"></div>
         </div>
     </div>
 </div>
@@ -144,12 +147,12 @@
 </div>
 
 <script>
-    var frmFiltrado = document.getElementById("frmFiltrado");
+    //var frmFiltrado = document.getElementById("frmFiltrado");
     var nombre = document.getElementById("nombregrupo");
-    //captura evento del texbox de filtrado
-    nombre.onkeyup = function () {
-        $("#frmFiltrado").trigger("submit");
-    }
+    // captura evento del texbox de filtrado
+    ///nombre.onkeyup = function () {
+    //    $("#frmFiltrado").trigger("submit");
+    //}
 
     function Agregar() {
         limpiarPermisos();
@@ -170,7 +173,6 @@
         limpiarPermisos();
         document.getElementById("titulo").value = id;
         document.getElementById("idGrupo").value = id;
-
         // recuperar nombre del grupo
         $.get("/Grupo/RecuperarDatosGrupo?titulo=" + id, function (data) {
             document.getElementById("nombreGrupo").value = data.nombreGrupo;
@@ -198,6 +200,8 @@
     }
 
     function seleccionarPermisos() {
+
+        console.log("seleccionarPermisos");
         var selectObject = document.getElementById("permisosSeleccionadosV");
         for (var i = 0; i < selectObject.options.length; i++) {
             if (selectObject.options[i].selected == false) {
@@ -211,8 +215,8 @@
             document.getElementById("contenidoAviso").classList = "alert-success modal-content";
             document.getElementById("descripcionAviso").innerHTML = "EL grupo se guardo correctamente";
             $('#modalAviso').modal('show');
+            document.getElementById("btnClose").click();
             $("#frmFiltrado").trigger("submit");
-            document.getElementById("btnCerrarConfirmacion").click();
         } else {
             document.getElementById("contenidoAviso").classList = "alert-danger  modal-content";
             document.getElementById("descripcionAviso").innerHTML = "Ocurrio un error, el grupo no se guardo";
@@ -227,13 +231,13 @@
         var id = document.getElementById("titulo").value;
         $.get("/Grupo/Eliminar?txtIdGrupo=" + id, function (data) {
             if (data == "999") {
-                document.getElementById("contenidoAviso").classList = "alert-success modal-content";
+                document.getElementById("contenidoAviso").classList = "alert-success modal-content"
                 document.getElementById("descripcionAviso").innerHTML = "El usuario se elimino correctamente";
                 $('#modalAviso').modal('show');
                 $("#frmFiltrado").trigger("submit");
                 document.getElementById("btnCerrarConfirmacion").click();
             } else {
-                document.getElementById("contenidoAviso").classList = "alert-danger  modal-content";
+                document.getElementById("contenidoAviso").classList = "alert-danger  modal-content"
                 document.getElementById("descripcionAviso").innerHTML = "Ocurrio un error, el usuario no se elimino";
                 $('#modalAviso').modal('show');
             }
@@ -321,7 +325,5 @@
         }
     }
 </script>
-
-
 
 

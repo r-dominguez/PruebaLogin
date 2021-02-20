@@ -117,9 +117,6 @@ namespace PruebaLogin.Controllers
                     table.AddCell(lista[i].email);
                     table.AddCell(lista[i].nombreGrupo);
                 }
-                
-
-
                 // asignar la tabla al documento 
                 doc.Add(table);
                 doc.Close();
@@ -129,9 +126,174 @@ namespace PruebaLogin.Controllers
             return File(buffer, "application/pdf");
         }
 
+        public ActionResult Index(int pagina = 1)
+        {
+            listarComboGrupo();
+            List<UsuarioCLS> listaUsuario = new List<UsuarioCLS>();
 
+            PaginadorGenerico<UsuarioCLS> _PaginadorUsuarios;
+            int _RegistrosPorPagina = 4;
+            int _TotalRegistros = 0;
+
+            using (var bd = new BDDemoLoginEntities())
+            {
+                listaUsuario = (from usuario in bd.Usuario
+                                join grupo in bd.Grupo
+                                on usuario.IDGRUPO equals grupo.IDGRUPO
+                                where usuario.HABILITADO == 1
+                                select new UsuarioCLS
+                                {
+                                    idUsuario = usuario.IDUSUARIO,
+                                    nombreUsuario = usuario.NOMBREUSUARIO,
+                                    email = usuario.EMAIL,
+                                    nombreGrupo = grupo.NOMBREGRUPO
+                                }).OrderBy(p => p.nombreUsuario)
+                                .Skip((pagina - 1) * _RegistrosPorPagina)
+                                .Take(_RegistrosPorPagina)
+                                .ToList();
+
+                _TotalRegistros = bd.Usuario.Where(p=>p.HABILITADO==1).Count();
+
+                // Número total de páginas de la tabla Customers
+                var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
+                // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
+                _PaginadorUsuarios = new PaginadorGenerico<UsuarioCLS>()
+                {
+                    RegistrosPorPagina = _RegistrosPorPagina,
+                    TotalRegistros = _TotalRegistros,
+                    TotalPaginas = _TotalPaginas,
+                    PaginaActual = pagina,
+                    Resultado = listaUsuario
+                };
+                // sesion con listado de usuario para los archivos pdf y excel
+                string nomUsuario = "";
+                Session["listaUsuario"] = listaParaArchivos(nomUsuario);
+            }
+            return View(_PaginadorUsuarios);
+        }
+
+
+        public ActionResult Filtrar(string nombreusuario, int pagina = 1)
+        {
+            PaginadorGenerico<UsuarioCLS> _PaginadorUsuarios;
+            int _RegistrosPorPagina = 4;
+            int _TotalRegistros = 0;
+
+            string nomUsuario = nombreusuario;
+            List<UsuarioCLS> listaUsuario = new List<UsuarioCLS>();
+            using (var bd = new BDDemoLoginEntities())
+            {
+                if (nomUsuario == null)
+                {
+
+                    listaUsuario = (from usuario in bd.Usuario
+                                    join grupo in bd.Grupo
+                                    on usuario.IDGRUPO equals grupo.IDGRUPO
+                                    where usuario.HABILITADO == 1
+                                    select new UsuarioCLS
+                                    {
+                                        idUsuario = usuario.IDUSUARIO,
+                                        nombreUsuario = usuario.NOMBREUSUARIO,
+                                        email = usuario.EMAIL,
+                                        nombreGrupo = grupo.NOMBREGRUPO
+                                    }).OrderBy(p => p.nombreUsuario)
+                                    .Skip((pagina - 1) * _RegistrosPorPagina)
+                                    .Take(_RegistrosPorPagina)
+                                    .ToList();
+
+                    _TotalRegistros = bd.Usuario.Where(p => p.HABILITADO == 1).Count();// Número total de páginas de la tabla ususarios
+                    var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
+                    // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
+                    _PaginadorUsuarios = new PaginadorGenerico<UsuarioCLS>()
+                    {
+                        RegistrosPorPagina = _RegistrosPorPagina,
+                        TotalRegistros = _TotalRegistros,
+                        TotalPaginas = _TotalPaginas,
+                        PaginaActual = pagina,
+                        Resultado = listaUsuario
+                    };
+                }
+                else
+                {
+                    listaUsuario = (from usuario in bd.Usuario
+                                    join grupo in bd.Grupo
+                                    on usuario.IDGRUPO equals grupo.IDGRUPO
+                                    where usuario.HABILITADO == 1
+                                    && usuario.NOMBREUSUARIO.Contains(nomUsuario)
+                                    select new UsuarioCLS
+                                    {
+                                        idUsuario = usuario.IDUSUARIO,
+                                        nombreUsuario = usuario.NOMBREUSUARIO,
+                                        email = usuario.EMAIL,
+                                        nombreGrupo = grupo.NOMBREGRUPO
+                                    }).OrderBy(p => p.nombreUsuario)
+                                    .Skip((pagina - 1) * _RegistrosPorPagina)
+                                    .Take(_RegistrosPorPagina)
+                                    .ToList();
+                    // Número total de páginas de la tabla Customers
+                    _TotalRegistros = bd.Usuario.Where(p => p.HABILITADO == 1
+                                      && p.NOMBREUSUARIO.Contains(nomUsuario)).Count();              
+                    var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
+                    // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
+                    _PaginadorUsuarios = new PaginadorGenerico<UsuarioCLS>()
+                    {
+                        RegistrosPorPagina = _RegistrosPorPagina,
+                        TotalRegistros = _TotalRegistros,
+                        TotalPaginas = _TotalPaginas,
+                        PaginaActual = pagina,
+                        Resultado = listaUsuario
+                    };
+                }
+                // sesion con listado de usuario para los archivos pdf y excel
+                Session["listaUsuario"] = listaParaArchivos(nomUsuario);
+            }
+            return PartialView("_TablaUsuario", _PaginadorUsuarios);
+        }
+
+        public List<UsuarioCLS> listaParaArchivos(string filtro)
+        {
+            List<UsuarioCLS> lista = new List<UsuarioCLS>();
+            if (filtro == null)
+            {
+                using (var bd = new BDDemoLoginEntities())
+                {
+                    lista = (from usuario in bd.Usuario
+                             join grupo in bd.Grupo
+                             on usuario.IDGRUPO equals grupo.IDGRUPO
+                             where usuario.HABILITADO == 1
+                             select new UsuarioCLS
+                             {
+                                 idUsuario = usuario.IDUSUARIO,
+                                 nombreUsuario = usuario.NOMBREUSUARIO,
+                                 email = usuario.EMAIL,
+                                 nombreGrupo = grupo.NOMBREGRUPO
+                             }).ToList();
+                }
+            }else
+            {
+                using (var bd = new BDDemoLoginEntities())
+                {
+                    lista = (from usuario in bd.Usuario
+                             join grupo in bd.Grupo
+                             on usuario.IDGRUPO equals grupo.IDGRUPO
+                             where usuario.HABILITADO == 1
+                             && usuario.NOMBREUSUARIO.Contains(filtro)
+                             select new UsuarioCLS
+                             {
+                                 idUsuario = usuario.IDUSUARIO,
+                                 nombreUsuario = usuario.NOMBREUSUARIO,
+                                 email = usuario.EMAIL,
+                                 nombreGrupo = grupo.NOMBREGRUPO
+                             }).ToList();
+                }
+            }
+            return lista;
+        }
+
+
+/*
         // GET: Usuario 
-        public ActionResult Index()
+        public ActionResult IndexSinPaginado()
         {
             listarComboGrupo();
             List<UsuarioCLS> listaUsuario = new List<UsuarioCLS>();
@@ -153,9 +315,10 @@ namespace PruebaLogin.Controllers
             return View(listaUsuario);
         }
 
+*/
 
-
-        public ActionResult Filtrar(UsuarioCLS oUsuarioCLS)
+/*
+        public ActionResult FiltrarSinPAginado(UsuarioCLS oUsuarioCLS)
         {
             string nomUsuario = oUsuarioCLS.nombreUsuario;
             List<UsuarioCLS> listaUsuario = new List<UsuarioCLS>();
@@ -196,7 +359,7 @@ namespace PruebaLogin.Controllers
             }
             return PartialView("_TablaUsuario", listaUsuario);
         }
-
+*/
 
 
         public void listarComboGrupo()
@@ -297,7 +460,7 @@ namespace PruebaLogin.Controllers
             return respuesta;
         }
 
-
+/*
         public ActionResult Agregar()
         {
             listarComboGrupo();
@@ -370,7 +533,8 @@ namespace PruebaLogin.Controllers
             }
             return RedirectToAction("Index");
         }
-
+*/
+/*
         public ActionResult Editar(int idUs)
         {
             listarComboGrupo();
@@ -428,6 +592,8 @@ namespace PruebaLogin.Controllers
             return RedirectToAction("Index");
         }
 
+*/
+/*
         [HttpPost]
         public ActionResult EliminarSinAjax(int txtIdUsuario)
         {
@@ -440,7 +606,7 @@ namespace PruebaLogin.Controllers
             return RedirectToAction("Index");
         }
 
-
+*/
         public string Eliminar(int txtIdUsuario)
         {
             string respuesta = "";

@@ -1,0 +1,40 @@
+﻿@using PruebaLogin.Models;
+@using PagedList.Mvc;
+@model  PagedList.IPagedList<GrupoCLS>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>@Html.LabelFor(p => Model[0].idGrupo)</th>
+            <th>@Html.LabelFor(p => Model[0].nombreGrupo)</th>
+            <th width="9%">Operaciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.idGrupo</td>
+                <td>@item.nombreGrupo</td>
+                <td>
+                    <button type="button" onclick="Editar(@item.idGrupo)" class="bi bi-pencil-square  btn btn-primary" data-toggle="modal" data-target="#modalAgregar">
+                    </button>
+                    <button type="button" onclick="Eliminar(@item.idGrupo)" class="bi bi-trash btn btn-danger" data-toggle="modal" data-target="#modalConfirmEliminar">
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <div class="pagination justify-content-start" style="width:50%;float:left;margin-top: 5px;">
+        Página @(Model.PageCount<Model.PageNumber ? 0 : Model.PageNumber) de @Model.PageCount
+    </div>
+    <div class="pagination justify-content-end">
+        @Html.PagedListPager(Model, page => Url.Action("Index", "Grupo", new { page }), new PagedListRenderOptions() { LiElementClasses = new List<string> { "page-item", "page-link" } })
+
+    </div>
+</nav>
+
+

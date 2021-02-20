@@ -77,13 +77,13 @@
     }
 
 
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
+<div class="container body-content">
+    @RenderBody()
+    <hr />
+    <footer>
+        <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+    </footer>
+</div>
 
 
     <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
@@ -95,8 +95,6 @@
 
         frmCambioContra = document.getElementById("frmCambioContra");
         function cambioContra() {
-            console.log("hola");
-            console.log(frmCambioContra);
             frmCambioContra.submit();
         }
 

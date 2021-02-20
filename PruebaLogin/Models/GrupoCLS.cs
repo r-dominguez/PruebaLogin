@@ -22,5 +22,7 @@ namespace PruebaLogin.Models
 
         public string mensajeErrorNombre { get; set; }
         public string mensajeErrorPermiso { get; set; }
+
+        public int cantPermisos { get; set; }
     }
 }

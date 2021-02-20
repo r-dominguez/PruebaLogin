@@ -12,6 +12,7 @@ using System.IO;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using PruebaLogin.ClasesAuxiliares;
 
 namespace PruebaLogin.Controllers
 {
@@ -33,7 +34,7 @@ namespace PruebaLogin.Controllers
                 // definir nombres de las columnas 
                 ew.Cells[1, 1].Value = "Id Grupo";
                 ew.Cells[1, 2].Value = "Nombre Grupo";
-                ew.Cells[1, 2].Value = "Cant Permisos";
+                ew.Cells[1, 3].Value = "Cant Permisos";
                 ew.Column(1).Width = 10;
                 ew.Column(2).Width = 30;
                 ew.Column(3).Width = 10;
@@ -69,8 +70,159 @@ namespace PruebaLogin.Controllers
             }
             return nPermisos;
         }
+
+
         // GET: Grupo
-        public ActionResult Index(int? page)
+        public ActionResult Index(int pagina = 1)
+        {
+            List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
+
+            PaginadorGenerico<GrupoCLS> _PaginadorGrupos;
+            int _RegistrosPorPagina = 4;
+            int _TotalRegistros = 0;
+
+            using (var bd = new BDDemoLoginEntities())
+            {
+                listaGrupo = (from grupo in bd.Grupo
+                              where grupo.HABILITADO == 1
+                              select new GrupoCLS
+                              {
+                                  idGrupo = grupo.IDGRUPO,
+                                  nombreGrupo = grupo.NOMBREGRUPO
+                              }).OrderBy(p => p.nombreGrupo)
+                                .Skip((pagina - 1) * _RegistrosPorPagina)
+                                .Take(_RegistrosPorPagina)
+                                .ToList();
+
+                _TotalRegistros = bd.Grupo.Where(p => p.HABILITADO == 1).Count();
+
+                // Número total de páginas de la tabla Customers
+                var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
+                // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
+                _PaginadorGrupos = new PaginadorGenerico<GrupoCLS>()
+                {
+                    RegistrosPorPagina = _RegistrosPorPagina,
+                    TotalRegistros = _TotalRegistros,
+                    TotalPaginas = _TotalPaginas,
+                    PaginaActual = pagina,
+                    Resultado = listaGrupo
+                };
+                // sesion con listado de usuario para los archivos pdf y excel
+                string nomUsuario = "";
+                Session["listaGrupo"] = listaParaArchivos(nomUsuario);
+            }
+            return View(_PaginadorGrupos);
+        }
+
+        public ActionResult Filtrar(string nombregrupo, int pagina = 1)
+        {
+           string nomGrupo = nombregrupo;
+            List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
+
+            PaginadorGenerico<GrupoCLS> _PaginadorGrupos;
+            int _RegistrosPorPagina = 4;
+            int _TotalRegistros = 0;
+
+            using (var bd = new BDDemoLoginEntities())
+            {
+                if (nomGrupo == null)
+                {
+                    listaGrupo = (from grupo in bd.Grupo
+                                  where grupo.HABILITADO == 1
+                                  select new GrupoCLS
+                                  {
+                                      idGrupo = grupo.IDGRUPO,
+                                      nombreGrupo = grupo.NOMBREGRUPO
+                                  }).OrderBy(p => p.nombreGrupo)
+                                .Skip((pagina - 1) * _RegistrosPorPagina)
+                                .Take(_RegistrosPorPagina)
+                                .ToList();
+
+                    _TotalRegistros = bd.Grupo.Where(p => p.HABILITADO == 1).Count();
+
+                    // Número total de páginas de la tabla Customers
+                    var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
+                    // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
+                    _PaginadorGrupos = new PaginadorGenerico<GrupoCLS>()
+                    {
+                        RegistrosPorPagina = _RegistrosPorPagina,
+                        TotalRegistros = _TotalRegistros,
+                        TotalPaginas = _TotalPaginas,
+                        PaginaActual = pagina,
+                        Resultado = listaGrupo
+                    };
+                }
+                else
+                {
+                    listaGrupo = (from grupo in bd.Grupo
+                                  where grupo.HABILITADO == 1
+                                  && grupo.NOMBREGRUPO.Contains(nomGrupo)
+                                  select new GrupoCLS
+                                  {
+                                      idGrupo = grupo.IDGRUPO,
+                                      nombreGrupo = grupo.NOMBREGRUPO
+                                  }).OrderBy(p => p.nombreGrupo)
+                                .Skip((pagina - 1) * _RegistrosPorPagina)
+                                .Take(_RegistrosPorPagina)
+                                .ToList();
+
+                    _TotalRegistros = bd.Grupo.Where(p => p.HABILITADO == 1
+                                                    && p.NOMBREGRUPO.Contains(nomGrupo)).Count();
+
+                    // Número total de páginas de la tabla Customers
+                    var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
+                    // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
+                    _PaginadorGrupos = new PaginadorGenerico<GrupoCLS>()
+                    {
+                        RegistrosPorPagina = _RegistrosPorPagina,
+                        TotalRegistros = _TotalRegistros,
+                        TotalPaginas = _TotalPaginas,
+                        PaginaActual = pagina,
+                        Resultado = listaGrupo
+                    };
+                }
+                // sesion con listado de grupo para los archivos pdf y excel
+                Session["listaGrupo"] = listaParaArchivos(nomGrupo);
+            }
+            return PartialView("_TablaGrupo", _PaginadorGrupos);
+        }
+
+
+        public List<GrupoCLS> listaParaArchivos(string filtro)
+        {
+            List<GrupoCLS> lista = new List<GrupoCLS>();
+            if (filtro == null)
+            {
+                using (var bd = new BDDemoLoginEntities())
+                {
+                    lista = (from grupo in bd.Grupo
+                             where grupo.HABILITADO == 1
+                             select new GrupoCLS
+                             {
+                                 idGrupo = grupo.IDGRUPO,
+                                 nombreGrupo = grupo.NOMBREGRUPO
+                             }).ToList();
+                }
+            }
+            else
+            {
+                using (var bd = new BDDemoLoginEntities())
+                {
+                    lista = (from grupo in bd.Grupo
+                             where grupo.HABILITADO == 1
+                             && grupo.NOMBREGRUPO.Contains(filtro)
+                             select new GrupoCLS
+                             {
+                                 idGrupo = grupo.IDGRUPO,
+                                 nombreGrupo = grupo.NOMBREGRUPO
+                             }).ToList();
+                }
+            }
+            return lista;
+        }
+
+        // GET: Grupo
+        public ActionResult IndexSinPaginado(int? page)
         {
             List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
             using (var bd = new BDDemoLoginEntities())
@@ -90,7 +242,8 @@ namespace PruebaLogin.Controllers
             return View(listaGrupo.ToPagedList(pageNumber, pageSize));
         }
 
-        public ActionResult Filtrar(GrupoCLS oGrupoCLS)
+
+        public ActionResult FiltrarSinpaginado(GrupoCLS oGrupoCLS)
         {
             string nomGrupo = oGrupoCLS.nombreGrupo;
             List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
@@ -545,9 +698,24 @@ namespace PruebaLogin.Controllers
         }
 
 
-        public ActionResult graficaGrupo()
+        public JsonResult recuperarCantPermisosGrupo()
         {
-            return View();
+            List<GrupoCLS> lista = new List<GrupoCLS>();
+            using (var bd = new BDDemoLoginEntities())
+            {
+                lista = (from grupo in bd.Grupo
+                         where grupo.HABILITADO == 1
+                         select new GrupoCLS
+                         {
+                             idGrupo = grupo.IDGRUPO,
+                             nombreGrupo = grupo.NOMBREGRUPO
+                         }).ToList();
+            }
+            for (int i= 0;i < lista.Count();i++)
+            {
+                lista[i].cantPermisos = cantPermisos(lista[i].idGrupo);
+            }
+                return Json(lista, JsonRequestBehavior.AllowGet);
         }
 
 
