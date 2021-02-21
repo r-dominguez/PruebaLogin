@@ -1,0 +1,258 @@
+﻿@using PruebaLogin.Models;
+@model GrupoCLS
+@{
+    ViewBag.Title = "reportes";
+    List<GrupoCLS> lista = (List<GrupoCLS>)ViewBag.listaGrupo;
+}
+
+<h2>Reporte: Grupo por cantidad de permisos</h2>
+
+
+@using (Ajax.BeginForm("gruposAgraficar", "Grupo", null, new AjaxOptions
+{
+    HttpMethod = "POST",
+    OnSuccess = "generarGraficar",
+    UpdateTargetId = "divError"
+}, new { id = "frmBuscarGrupos", name = "frmBuscarGrupos" }))
+{
+
+    <div style="padding-bottom:1em;padding-top:1em">
+        <h4>Selecione los grupos que quiere graficar.</h4>
+    </div>
+
+    <div style="padding-bottom:1em;padding-top:1em">
+        <input type="checkbox" id="seleccionarTodo" value="" />
+        <label>Todos</label>
+        <input type="checkbox" id="seleccionarNada" value="" />
+        <label>Ninguno</label>
+    </div>
+    <div id="grupoCheck">
+        @for (var i = 0; i < lista.Count(); i++)
+        {
+            <span>
+                <input type="checkbox" name="grupoParaGraficar" value=@lista[i].idGrupo />
+                <label>@lista[i].nombreGrupo</label>
+            </span>
+        }
+    </div>
+
+    
+
+    <div style="padding-top:1em;padding-top:1em;">
+        <button type="submit" id="btn-graficar" class="btn btn-primary" disabled>Graficar Grupos seleccionados</button>
+        @Html.ActionLink(" Descargar en PDF", "generarPDF", "Grupo", null, new { @class = "btn btn-primary bi bi-download  disabled", @target = "_blank" })
+    </div>
+
+}
+
+
+
+<div id="graficaGruposSeleccionados" style="width:1000px; height:400px; margin-left:auto; margin-right:auto;"></div>
+<div id="graficaGrupos" style="width:1000px; height:400px; margin-left:auto; margin-right:auto; display:none;"></div>
+
+<script type="text/javascript">
+
+    var seleccionarTodo = document.getElementById("seleccionarTodo");
+    seleccionarTodo.onclick = function () {
+        document.getElementById("btn-graficar").disabled = false;
+        document.getElementById("seleccionarTodo").disabled = true;
+        for (i = 0; i < document.frmBuscarGrupos.elements.length; i++)
+            if (document.frmBuscarGrupos.elements[i].type == "checkbox")
+                if (document.frmBuscarGrupos.elements[i].name == "grupoParaGraficar")
+                    document.frmBuscarGrupos.elements[i].checked = 1
+    }
+
+    var seleccionarNada = document.getElementById("seleccionarNada");
+    seleccionarNada.onclick = function () {
+        document.getElementById("btn-graficar").disabled = true;
+        document.getElementById("seleccionarTodo").disabled = false;
+        for (i = 0; i < document.frmBuscarGrupos.elements.length; i++)
+            if (document.frmBuscarGrupos.elements[i].type == "checkbox")
+                document.frmBuscarGrupos.elements[i].checked = 0
+    }
+
+    var grupoCheck = document.getElementById("grupoCheck");
+    grupoCheck.onclick = function () {
+        seleccionarNada.checked = 0;
+        seleccionarTodo.checked = 0;
+        var marcados = 0;
+        for (i = 0; i < document.frmBuscarGrupos.elements.length; i++) {
+            if (document.frmBuscarGrupos.elements[i].type == "checkbox") {
+                if (document.frmBuscarGrupos.elements[i].name == "grupoParaGraficar") {
+                    if (document.frmBuscarGrupos.elements[i].checked == 1) {
+                        marcados = 1;
+                    }
+                }
+            }
+        }
+        console.log(marcados);
+        if (marcados == 1) {
+            console.log("dentro if marcados");
+            document.getElementById("btn-graficar").disabled = false;
+            document.getElementById("seleccionarTodo").disabled = false;
+        } else {
+            document.getElementById("btn-graficar").disabled = true;
+        }
+    }
+
+    ///////////////  grafica solo la lista de seleccionados
+
+    function generarGraficar(lista) {
+        // Carga la API de visualización de google chart y el paquete corechart.
+        google.charts.load('current', { 'packages': ['corechart'] });
+
+        // Definir un callback para que se ejecute cuando se cargue la API de visualización de Google.
+        google.charts.setOnLoadCallback(drawChart(lista));
+
+        // Callback que crea y llena una tabla de datos,
+        // crea una instancia del gráfico, pasa los datos y
+        // lo dibuja.
+        function drawChart(lista) {
+            // setear las opciones de la gráfica
+            var options =
+            {
+                title: 'Grupos por Cantidad de Permisos',
+                width: 1200,
+                height: 400,
+                sliceVisibilityThreshold: 0,
+                legend: { position: "top", alignment: "end" },
+                chartArea: { left: 50, top: 80, height: "100%" },
+                hAxis:
+                {
+                    slantedText: true,
+                    slantedTextAngle: 18
+                },
+                bar: { groupWidth: "50%" },
+            };
+
+            // llamar a la función que dibuja la gráfica.
+            drawGraph(lista, options);
+        }
+        function drawGraph(dataValues, options) {
+            // Inicializar el objeto donde agregar las columnas y filas de la grafica.
+            var data = new google.visualization.DataTable();
+
+            // definir las columnas de la gráfica, nombre y tipo de dato.
+            data.addColumn('string', 'Nomnbre Grupo');
+            data.addColumn('number', 'Cantidad de Permisos');
+
+            // procesar los datos recibidos del controlador.
+            for (var i = 0; i < dataValues.length; i++) {
+                // setear los datos a graficar en cada fila de la gráfica.
+                data.addRow([dataValues[i].nombreGrupo, dataValues[i].cantPermisos]);
+            }
+
+            // Configurar las etiquetas.
+            var view = new google.visualization.DataView(data);
+            view.setColumns([0,
+                {
+                    calc: "stringify",
+                    sourceColumn: 0,
+                    type: "string",
+                    role: "annotation"
+                },
+                1,
+                {
+                    calc: "stringify",
+                    sourceColumn: 1,
+                    type: "string",
+                    role: "annotation"
+                }
+            ]);
+
+            // instamciar las columnas de una grafica y definir donde dibujarla
+            var chart = new google.visualization.ColumnChart(document.getElementById("graficaGruposSeleccionados"));
+            // dibujar la gráfica pasandole las opciones definidas anteriormente
+            chart.draw(view, options);
+        }
+        
+    }
+
+    /////////////        grafica  todos los grupos /////////////////// -->
+
+    // Carga la API de visualización de google chart y el paquete corechart.
+    google.charts.load('current', { 'packages': ['corechart'] });
+
+    // Definir un callback para que se ejecute cuando se cargue la API de visualización de Google.
+    google.charts.setOnLoadCallback(drawChart);
+
+    // Callback que crea y llena una tabla de datos,
+    // crea una instancia del gráfico, pasa los datos y
+    // lo dibuja.
+    function drawChart() {
+
+        // Crear el datatable donde generar la gráfica.
+        var data1 = new google.visualization.DataTable();
+        $.ajax(
+            {
+                type: 'POST',
+                dataType: 'JSON',
+                url: '/Grupo/recuperarCantPermisosGrupo',
+                success:
+                    function (response) {
+                        // setear las opciones de la gráfica
+                        var options =
+                        {
+                            title: 'Grupos por Cantidad de Permisos',
+                            width: 1200,
+                            height: 400,
+                            sliceVisibilityThreshold: 0,
+                            legend: { position: "top", alignment: "end" },
+                            chartArea: { left: 50, top: 80, height: "100%" },
+                            hAxis:
+                            {
+                                slantedText: true,
+                                slantedTextAngle: 18
+                            },
+                            bar: { groupWidth: "50%" },
+                        };
+
+                        // llamar a la función que dibuja la gráfica.
+                        drawGraph(response, options);
+                    }
+            });
+
+        function drawGraph(dataValues, options) {
+            // Inicializar el objeto donde agregar las columnas y filas de la grafica.
+
+            var data1 = new google.visualization.DataTable();
+
+            // definir las columnas de la gráfica, nombre y tipo de dato.
+            data1.addColumn('string', 'Nomnbre Grupo');
+            data1.addColumn('number', 'Cantidad de Permisos');
+
+            // procesar los datos recibidos del controlador.
+            for (var i = 0; i < dataValues.length; i++) {
+                // setear los datos a graficar en cada fila de la gráfica.
+                data1.addRow([dataValues[i].nombreGrupo, dataValues[i].cantPermisos]);
+            }
+
+            // Configurar las etiquetas.
+            var view = new google.visualization.DataView(data1);
+            view.setColumns([0,
+                {
+                    calc: "stringify",
+                    sourceColumn: 0,
+                    type: "string",
+                    role: "annotation"
+                },
+                1,
+                {
+                    calc: "stringify",
+                    sourceColumn: 1,
+                    type: "string",
+                    role: "annotation"
+                }
+            ]);
+
+            // instamciar las columnas de una grafica y definir donde dibujarla
+            var chart = new google.visualization.ColumnChart(document.getElementById("graficaGrupos"));
+            // dibujar la gráfica pasandole las opciones definidas anteriormente
+            chart.draw(view, options);
+        }
+    }
+
+</script>
+
+
+

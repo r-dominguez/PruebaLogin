@@ -485,7 +485,51 @@ namespace PruebaLogin.Controllers
             return Json(lista, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult Reportes()
+        {
+            listarGruposActivos();
+            return View();
+        }
 
+
+        public JsonResult gruposAgraficar(int[] grupoParaGraficar)
+        {
+            int[] arregloGrupoParaGraficar = grupoParaGraficar;
+            List<GrupoCLS> listaEnBase = new List<GrupoCLS>();
+            List<GrupoCLS> lista = new List<GrupoCLS>();
+            using (var bd = new BDDemoLoginEntities())
+            {
+                listaEnBase = (from grupo in bd.Grupo
+                         where grupo.HABILITADO == 1
+                               select new GrupoCLS
+                         {
+                             idGrupo = grupo.IDGRUPO,
+                             nombreGrupo = grupo.NOMBREGRUPO
+                         }).ToList();
+            }
+            for (int i = 0; i < listaEnBase.Count(); i++)
+            {
+                listaEnBase[i].cantPermisos = cantPermisos(listaEnBase[i].idGrupo);
+
+            }
+     
+            foreach (var item in listaEnBase)
+            {
+                for (int i = 0; i < arregloGrupoParaGraficar.Length; i++)
+                {
+                    if (item.idGrupo == arregloGrupoParaGraficar[i])
+                    {
+                        lista.Insert(0, item);
+                    }
+                }
+            }
+
+            var listaOrdenada = lista.OrderBy(p => p.nombreGrupo).ToList();
+            return Json(listaOrdenada, JsonRequestBehavior.AllowGet);
+        }
+
+
+        // lista grupos y cantidad de permisos por grupo para graficar
         public JsonResult recuperarCantPermisosGrupo()
         {
             List<GrupoCLS> lista = new List<GrupoCLS>();
@@ -502,10 +546,28 @@ namespace PruebaLogin.Controllers
             for (int i= 0;i < lista.Count();i++)
             {
                 lista[i].cantPermisos = cantPermisos(lista[i].idGrupo);
+
             }
                 return Json(lista, JsonRequestBehavior.AllowGet);
         }
 
+        // viewbag de grupos activos
+        public void listarGruposActivos()
+        {
+            List<GrupoCLS> lista = new List<GrupoCLS>();
+            using (var bd = new BDDemoLoginEntities())
+            {
+                lista = (from grupo in bd.Grupo
+                         where grupo.HABILITADO == 1
+                         select new GrupoCLS
+                         {
+                             idGrupo = grupo.IDGRUPO,
+                             nombreGrupo = grupo.NOMBREGRUPO
+                         }).ToList();
+                ViewBag.listaGrupo = lista;
+            }
+
+        }
 
     }
 }
