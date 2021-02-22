@@ -87,7 +87,6 @@
         }
         console.log(marcados);
         if (marcados == 1) {
-            console.log("dentro if marcados");
             document.getElementById("btn-graficar").disabled = false;
             document.getElementById("seleccionarTodo").disabled = false;
         } else {
@@ -102,7 +101,7 @@
         google.charts.load('current', { 'packages': ['corechart'] });
 
         // Definir un callback para que se ejecute cuando se cargue la API de visualización de Google.
-        google.charts.setOnLoadCallback(drawChart(lista));
+        google.charts.setOnLoadCallback(function () { drawChart(lista) });
 
         // Callback que crea y llena una tabla de datos,
         // crea una instancia del gráfico, pasa los datos y
@@ -165,93 +164,8 @@
             // dibujar la gráfica pasandole las opciones definidas anteriormente
             chart.draw(view, options);
         }
-        
+            
     }
-
-    /////////////        grafica  todos los grupos /////////////////// -->
-
-    // Carga la API de visualización de google chart y el paquete corechart.
-    google.charts.load('current', { 'packages': ['corechart'] });
-
-    // Definir un callback para que se ejecute cuando se cargue la API de visualización de Google.
-    google.charts.setOnLoadCallback(drawChart);
-
-    // Callback que crea y llena una tabla de datos,
-    // crea una instancia del gráfico, pasa los datos y
-    // lo dibuja.
-    function drawChart() {
-
-        // Crear el datatable donde generar la gráfica.
-        var data1 = new google.visualization.DataTable();
-        $.ajax(
-            {
-                type: 'POST',
-                dataType: 'JSON',
-                url: '/Grupo/recuperarCantPermisosGrupo',
-                success:
-                    function (response) {
-                        // setear las opciones de la gráfica
-                        var options =
-                        {
-                            title: 'Grupos por Cantidad de Permisos',
-                            width: 1200,
-                            height: 400,
-                            sliceVisibilityThreshold: 0,
-                            legend: { position: "top", alignment: "end" },
-                            chartArea: { left: 50, top: 80, height: "100%" },
-                            hAxis:
-                            {
-                                slantedText: true,
-                                slantedTextAngle: 18
-                            },
-                            bar: { groupWidth: "50%" },
-                        };
-
-                        // llamar a la función que dibuja la gráfica.
-                        drawGraph(response, options);
-                    }
-            });
-
-        function drawGraph(dataValues, options) {
-            // Inicializar el objeto donde agregar las columnas y filas de la grafica.
-
-            var data1 = new google.visualization.DataTable();
-
-            // definir las columnas de la gráfica, nombre y tipo de dato.
-            data1.addColumn('string', 'Nomnbre Grupo');
-            data1.addColumn('number', 'Cantidad de Permisos');
-
-            // procesar los datos recibidos del controlador.
-            for (var i = 0; i < dataValues.length; i++) {
-                // setear los datos a graficar en cada fila de la gráfica.
-                data1.addRow([dataValues[i].nombreGrupo, dataValues[i].cantPermisos]);
-            }
-
-            // Configurar las etiquetas.
-            var view = new google.visualization.DataView(data1);
-            view.setColumns([0,
-                {
-                    calc: "stringify",
-                    sourceColumn: 0,
-                    type: "string",
-                    role: "annotation"
-                },
-                1,
-                {
-                    calc: "stringify",
-                    sourceColumn: 1,
-                    type: "string",
-                    role: "annotation"
-                }
-            ]);
-
-            // instamciar las columnas de una grafica y definir donde dibujarla
-            var chart = new google.visualization.ColumnChart(document.getElementById("graficaGrupos"));
-            // dibujar la gráfica pasandole las opciones definidas anteriormente
-            chart.draw(view, options);
-        }
-    }
-
 </script>
 
 
