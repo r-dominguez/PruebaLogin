@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PruebaLogin", "PruebaLogin\PruebaLogin.csproj", "{0DE53239-71F0-43C2-9157-A01E94D563EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logica", "Logica\Logica.csproj", "{39F4717A-8CB4-4B1E-BBDE-0032625181DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistencia", "Persistencia\Persistencia.csproj", "{0BB2837F-7F7E-4D36-81BD-489593FDD876}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{0DE53239-71F0-43C2-9157-A01E94D563EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0DE53239-71F0-43C2-9157-A01E94D563EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0DE53239-71F0-43C2-9157-A01E94D563EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39F4717A-8CB4-4B1E-BBDE-0032625181DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39F4717A-8CB4-4B1E-BBDE-0032625181DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39F4717A-8CB4-4B1E-BBDE-0032625181DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39F4717A-8CB4-4B1E-BBDE-0032625181DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BB2837F-7F7E-4D36-81BD-489593FDD876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BB2837F-7F7E-4D36-81BD-489593FDD876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BB2837F-7F7E-4D36-81BD-489593FDD876}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BB2837F-7F7E-4D36-81BD-489593FDD876}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
