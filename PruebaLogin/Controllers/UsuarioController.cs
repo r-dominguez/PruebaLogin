@@ -16,6 +16,8 @@ using iTextSharp.text.pdf;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using DTO;
+using Logica;
 
 namespace PruebaLogin.Controllers
 {
@@ -26,421 +28,141 @@ namespace PruebaLogin.Controllers
         public FileResult generarExcel()
         {
             byte[] buffer;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                //doc excel 
-                ExcelPackage ep = new ExcelPackage();
-                // definir hoja de excel 
-                ep.Workbook.Worksheets.Add("Reporte de Usuarios");
-                //agrega hoja al documento
-                var currentSheet = ep.Workbook.Worksheets;
-                var ew = currentSheet.First();
-                // definir nombres de las columnas 
-                ew.Cells[1, 1].Value = "Id Marca";
-                ew.Cells[1, 2].Value = "Nombre Marca";
-                ew.Cells[1, 3].Value = "Email Marca";
-                ew.Cells[1, 4].Value = "Grupo Marca";
-                ew.Column(1).Width = 10;
-                ew.Column(2).Width = 20;
-                ew.Column(3).Width = 40;
-                ew.Column(4).Width = 20;
-                using (var range = ew.Cells[1,1,1,4])
-                {
-                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    range.Style.Font.Color.SetColor(Color.White);
-                    range.Style.Fill.BackgroundColor.SetColor(Color.DarkRed);
-                }
-                // recuperar la lista desde la session
-                List<UsuarioCLS> lista = (List<UsuarioCLS>)Session["listaUsuario"];
-                int nregistros = lista.Count();
-                //recorrer la lista y cargar los datos en las celdas
-                for (int i = 0; i < nregistros; i++)
-                {
-                    ew.Cells[i + 2, 1].Value = lista[i].idUsuario;
-                    ew.Cells[i + 2, 2].Value = lista[i].nombreUsuario;
-                    ew.Cells[i + 2, 3].Value = lista[i].email;
-                    ew.Cells[i + 2, 4].Value = lista[i].nombreGrupo;
-                }
 
-                ep.SaveAs(ms);
-                buffer = ms.ToArray();
+            // recuperar la lista desde la session
+            List<Usuario_CLS> lista = (List<Usuario_CLS>)Session["listaUsuario"];
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
+            buffer = usuarioLogica.datosArchivoExcel(lista);
 
-            }
             return File(buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
-
         public FileResult generarPDF()
         {
-            Document doc = new Document();
             byte[] buffer;
 
-            using (MemoryStream ms= new MemoryStream())
-            {
-                PdfWriter.GetInstance(doc, ms);
-                doc.Open();
-                //titulo
-                Paragraph title = new Paragraph("Listado de Usuarios");
-                title.Alignment = Element.ALIGN_CENTER;
-                doc.Add(title);
-                Paragraph espaciador = new Paragraph(" ");
-                doc.Add(espaciador);
-                //columnas de tabla 
-                PdfPTable table = new PdfPTable(4);
-                // definir anchos de las columanas 
-                float[] values = new float[4] {30,50,80,50};
-                // asignar anchos de las columanas 
-                table.SetWidths(values);
-                //encabezados de la tabla
-                PdfPCell celda1 = new PdfPCell(new Phrase("Id Usuario"));
-                celda1.BackgroundColor = new BaseColor(130,130,130);
-                celda1.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                table.AddCell(celda1);
-                PdfPCell celda2 = new PdfPCell(new Phrase("Nombre Usuario"));
-                celda2.BackgroundColor = new BaseColor(130, 130, 130);
-                celda2.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                table.AddCell(celda2);
-                PdfPCell celda3 = new PdfPCell(new Phrase("Email"));
-                celda3.BackgroundColor = new BaseColor(130, 130, 130);
-                celda3.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                table.AddCell(celda3);
-                PdfPCell celda4 = new PdfPCell(new Phrase("Grupo"));
-                celda4.BackgroundColor = new BaseColor(130, 130, 130);
-                celda4.HorizontalAlignment = PdfPCell.ALIGN_CENTER;
-                table.AddCell(celda4);
-                List<UsuarioCLS> lista = (List<UsuarioCLS>)Session["listaUsuario"];
-                int nregistros = lista.Count();
-                for (int i = 0; i < nregistros; i++)
-                {
-                    table.AddCell(lista[i].idUsuario.ToString());
-                    table.AddCell(lista[i].nombreGrupo);
-                    table.AddCell(lista[i].email);
-                    table.AddCell(lista[i].nombreGrupo);
-                }
-                // asignar la tabla al documento 
-                doc.Add(table);
-                doc.Close();
+            // recuperar la lista desde la session
+            List<Usuario_CLS> lista = (List<Usuario_CLS>)Session["listaUsuario"];
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
+            buffer = usuarioLogica.datosArchivoPDF(lista);
 
-                buffer = ms.ToArray();
-            }
             return File(buffer, "application/pdf");
         }
 
         public ActionResult Index(int pagina = 1)
         {
-            listarComboGrupo();
-            List<UsuarioCLS> listaUsuario = new List<UsuarioCLS>();
+            GrupoLogica grupoLogica = new GrupoLogica();
+            ViewBag.listaGrupo = grupoLogica.listaComboGrupo();
 
-            PaginadorGenerico<UsuarioCLS> _PaginadorUsuarios;
-            int _RegistrosPorPagina = 4;
-            int _TotalRegistros = 0;
+            // carga la lista de usuarios paginados desde la capa de logica
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
+            PaginadorGenericoL<Usuario_CLS> _PaginadorUsuarios = new PaginadorGenericoL<Usuario_CLS>();
+            _PaginadorUsuarios = usuarioLogica.listaCompletaPaginada(pagina);
 
-            using (var bd = new BDDemoLoginEntities())
-            {
-                listaUsuario = (from usuario in bd.Usuario
-                                join grupo in bd.Grupo
-                                on usuario.IDGRUPO equals grupo.IDGRUPO
-                                where usuario.HABILITADO == 1
-                                select new UsuarioCLS
-                                {
-                                    idUsuario = usuario.IDUSUARIO,
-                                    nombreUsuario = usuario.NOMBREUSUARIO,
-                                    email = usuario.EMAIL,
-                                    nombreGrupo = grupo.NOMBREGRUPO
-                                }).OrderBy(p => p.nombreUsuario)
-                                .Skip((pagina - 1) * _RegistrosPorPagina)
-                                .Take(_RegistrosPorPagina)
-                                .ToList();
+            // sesion con listado de usuario para los archivos pdf y excel
+            // el nomUsuario va vacio porque se usa un mismo metodo para listado completo y filtrado
+            string nomUsuario = "";
+            Session["listaUsuario"] = usuarioLogica.listadoParaArchivos(nomUsuario);
 
-                _TotalRegistros = bd.Usuario.Where(p=>p.HABILITADO==1).Count();
-
-                // Número total de páginas de la tabla Customers
-                var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
-                // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
-                _PaginadorUsuarios = new PaginadorGenerico<UsuarioCLS>()
-                {
-                    RegistrosPorPagina = _RegistrosPorPagina,
-                    TotalRegistros = _TotalRegistros,
-                    TotalPaginas = _TotalPaginas,
-                    PaginaActual = pagina,
-                    Resultado = listaUsuario
-                };
-                // sesion con listado de usuario para los archivos pdf y excel
-                string nomUsuario = "";
-                Session["listaUsuario"] = listaParaArchivos(nomUsuario);
-            }
             return View(_PaginadorUsuarios);
         }
 
 
         public ActionResult Filtrar(string nombreusuario, int pagina = 1)
         {
-            PaginadorGenerico<UsuarioCLS> _PaginadorUsuarios;
-            int _RegistrosPorPagina = 4;
-            int _TotalRegistros = 0;
 
-            string nomUsuario = nombreusuario;
-            List<UsuarioCLS> listaUsuario = new List<UsuarioCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                if (nomUsuario == null)
-                {
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
+            PaginadorGenericoL<Usuario_CLS> _PaginadorUsuarios = new PaginadorGenericoL<Usuario_CLS>();
+            _PaginadorUsuarios = usuarioLogica.listaFiltradaPaginada(nombreusuario, pagina);
 
-                    listaUsuario = (from usuario in bd.Usuario
-                                    join grupo in bd.Grupo
-                                    on usuario.IDGRUPO equals grupo.IDGRUPO
-                                    where usuario.HABILITADO == 1
-                                    select new UsuarioCLS
-                                    {
-                                        idUsuario = usuario.IDUSUARIO,
-                                        nombreUsuario = usuario.NOMBREUSUARIO,
-                                        email = usuario.EMAIL,
-                                        nombreGrupo = grupo.NOMBREGRUPO
-                                    }).OrderBy(p => p.nombreUsuario)
-                                    .Skip((pagina - 1) * _RegistrosPorPagina)
-                                    .Take(_RegistrosPorPagina)
-                                    .ToList();
+            // sesion con listado de usuario para los archivos pdf y excel
+            string nomUsuario = "";
+            Session["listaUsuario"] = usuarioLogica.listadoParaArchivos(nomUsuario);
 
-                    _TotalRegistros = bd.Usuario.Where(p => p.HABILITADO == 1).Count();// Número total de páginas de la tabla ususarios
-                    var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
-                    // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
-                    _PaginadorUsuarios = new PaginadorGenerico<UsuarioCLS>()
-                    {
-                        RegistrosPorPagina = _RegistrosPorPagina,
-                        TotalRegistros = _TotalRegistros,
-                        TotalPaginas = _TotalPaginas,
-                        PaginaActual = pagina,
-                        Resultado = listaUsuario
-                    };
-                }
-                else
-                {
-                    listaUsuario = (from usuario in bd.Usuario
-                                    join grupo in bd.Grupo
-                                    on usuario.IDGRUPO equals grupo.IDGRUPO
-                                    where usuario.HABILITADO == 1
-                                    && usuario.NOMBREUSUARIO.Contains(nomUsuario)
-                                    select new UsuarioCLS
-                                    {
-                                        idUsuario = usuario.IDUSUARIO,
-                                        nombreUsuario = usuario.NOMBREUSUARIO,
-                                        email = usuario.EMAIL,
-                                        nombreGrupo = grupo.NOMBREGRUPO
-                                    }).OrderBy(p => p.nombreUsuario)
-                                    .Skip((pagina - 1) * _RegistrosPorPagina)
-                                    .Take(_RegistrosPorPagina)
-                                    .ToList();
-                    // Número total de páginas de la tabla Customers
-                    _TotalRegistros = bd.Usuario.Where(p => p.HABILITADO == 1
-                                      && p.NOMBREUSUARIO.Contains(nomUsuario)).Count();              
-                    var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
-                    // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
-                    _PaginadorUsuarios = new PaginadorGenerico<UsuarioCLS>()
-                    {
-                        RegistrosPorPagina = _RegistrosPorPagina,
-                        TotalRegistros = _TotalRegistros,
-                        TotalPaginas = _TotalPaginas,
-                        PaginaActual = pagina,
-                        Resultado = listaUsuario
-                    };
-                }
-                // sesion con listado de usuario para los archivos pdf y excel
-                Session["listaUsuario"] = listaParaArchivos(nomUsuario);
-            }
             return PartialView("_TablaUsuario", _PaginadorUsuarios);
         }
 
-        public List<UsuarioCLS> listaParaArchivos(string filtro)
+
+        public string Guardar(Usuario_CLS oUsuario_CLS, int titulo)
         {
-            List<UsuarioCLS> lista = new List<UsuarioCLS>();
-            if (filtro == null)
-            {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    lista = (from usuario in bd.Usuario
-                             join grupo in bd.Grupo
-                             on usuario.IDGRUPO equals grupo.IDGRUPO
-                             where usuario.HABILITADO == 1
-                             select new UsuarioCLS
-                             {
-                                 idUsuario = usuario.IDUSUARIO,
-                                 nombreUsuario = usuario.NOMBREUSUARIO,
-                                 email = usuario.EMAIL,
-                                 nombreGrupo = grupo.NOMBREGRUPO
-                             }).ToList();
-                }
-            }else
-            {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    lista = (from usuario in bd.Usuario
-                             join grupo in bd.Grupo
-                             on usuario.IDGRUPO equals grupo.IDGRUPO
-                             where usuario.HABILITADO == 1
-                             && usuario.NOMBREUSUARIO.Contains(filtro)
-                             select new UsuarioCLS
-                             {
-                                 idUsuario = usuario.IDUSUARIO,
-                                 nombreUsuario = usuario.NOMBREUSUARIO,
-                                 email = usuario.EMAIL,
-                                 nombreGrupo = grupo.NOMBREGRUPO
-                             }).ToList();
-                }
-            }
-            return lista;
-        }
-
-
-        public void listarComboGrupo()
-        {
-            List<SelectListItem> lista;
-            using (var bd = new BDDemoLoginEntities())
-            {
-                lista = (from grupo in bd.Grupo
-                              where grupo.HABILITADO == 1
-                              select new SelectListItem
-                              {
-                                  Text = grupo.NOMBREGRUPO,
-                                  Value = grupo.IDGRUPO.ToString()
-                              }).ToList();
-                lista.Insert(0, new SelectListItem { Text = "Seleccione una opción", Value = "" });
-                ViewBag.listaGrupo = lista;
-            }
-
-        }
-
-
-        public string Guardar(UsuarioCLS oUsuarioCLS, int titulo)
-        {
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
             string respuesta = "";
-
             int numRegistroEncontradosUs = 0;
             int numRegistroEncontradosEm = 0;
-            try
-            {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    if (titulo== -1)
-                    {
-                    numRegistroEncontradosUs = bd.Usuario.Where(p => p.NOMBREUSUARIO == oUsuarioCLS.nombreUsuario).Count();
-                    numRegistroEncontradosEm = bd.Usuario.Where(p => p.EMAIL == oUsuarioCLS.email).Count();
-                    }
-                    else
-                    {
-                        numRegistroEncontradosUs = bd.Usuario.Where(p => p.NOMBREUSUARIO == oUsuarioCLS.nombreUsuario && p.IDUSUARIO != titulo).Count();
-                        numRegistroEncontradosEm = bd.Usuario.Where(p => p.EMAIL == oUsuarioCLS.email
-                        && p.IDUSUARIO != titulo).Count();
-                    }
 
-                }
-                if (!ModelState.IsValid || numRegistroEncontradosUs >= 1 || numRegistroEncontradosEm >= 1)
-                {
-                    // revisar errores del modelo 
-                    var query = (from state in ModelState.Values
-                                 from error in state.Errors
-                                 select error.ErrorMessage).ToList();
-                    // concatenar el mensaje de error
-                    respuesta += "<ul class='list-group'>";
-                    foreach (var item in query)
-                    {
-                        respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>" + item + "</li>";
-                    }
-                    if (numRegistroEncontradosUs >= 1) respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>El nombre de usuario ya existe</li>";
-                    if (numRegistroEncontradosEm >= 1) respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>El mail ya existe</li>";
-                    respuesta += "</ul'>";
-                    //
-                }
-                else
-                {
-                    using (var bd = new BDDemoLoginEntities())
-                    {
-                        if (titulo == -1)
-                        {
-                            // guardar
-                            Usuario oUsuario = new Usuario();
-                            oUsuario.NOMBREUSUARIO = oUsuarioCLS.nombreUsuario;
-                            SHA256Managed sha = new SHA256Managed();
-                            byte[] byteContra = Encoding.Default.GetBytes(oUsuarioCLS.contra);
-                            byte[] byteContraCifrada = sha.ComputeHash(byteContra);
-                            string cadenContraCifrada = BitConverter.ToString(byteContraCifrada).Replace("-", "");
-                            oUsuario.CONTRA = cadenContraCifrada;
-                            oUsuario.IDGRUPO = oUsuarioCLS.idGrupo;
-                            oUsuario.EMAIL = oUsuarioCLS.email;
-                            oUsuario.HABILITADO = 1;
-                            bd.Usuario.Add(oUsuario);
-                            respuesta = bd.SaveChanges().ToString();
-                            if (respuesta == "0") respuesta = "";
-                        }
-                        else
-                        {
-                            // editar
-                            Usuario oUsuario = bd.Usuario.Where(p => p.IDUSUARIO == titulo).First();
-                            oUsuario.NOMBREUSUARIO = oUsuarioCLS.nombreUsuario;
-                            oUsuario.EMAIL = oUsuarioCLS.email;
-                            oUsuario.IDGRUPO = oUsuarioCLS.idGrupo;
-                            respuesta = bd.SaveChanges().ToString();
-                        }
-                    }
-                }
-            } catch (Exception ex)
+            if (titulo == -1)
             {
-                respuesta = "";
+                numRegistroEncontradosUs = usuarioLogica.RegistrosEncontradosUs(oUsuario_CLS.nombreUsuario);
+                numRegistroEncontradosUs = usuarioLogica.RegistrosEncontradosEm(oUsuario_CLS.email);
+            }
+            else
+            {
+                numRegistroEncontradosUs = usuarioLogica.RegistrosEncontradosUsId(oUsuario_CLS.nombreUsuario, titulo);
+                numRegistroEncontradosEm = usuarioLogica.RegistrosEncontradosEmId(oUsuario_CLS.email, titulo);
+
+            }
+            if (!ModelState.IsValid || numRegistroEncontradosUs >= 1 || numRegistroEncontradosEm >= 1)
+            {
+                // revisar errores del modelo 
+                var query = (from state in ModelState.Values
+                                from error in state.Errors
+                                select error.ErrorMessage).ToList();
+                // concatenar el mensaje de error
+                respuesta += "<ul class='list-group'>";
+                foreach (var item in query)
+                {
+                    respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>" + item + "</li>";
+                }
+                if (numRegistroEncontradosUs >= 1) respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>El nombre de usuario ya existe</li>";
+                if (numRegistroEncontradosEm >= 1) respuesta += "<li class='text-danger list-group-item' style='list-style:none;'>El mail ya existe</li>";
+                respuesta += "</ul'>";
+                //
+            }
+            else
+            {
+                // llamada a logica 
+                respuesta = usuarioLogica.guardar(oUsuario_CLS, titulo);
             }
             return respuesta;
         }
 
         public string Eliminar(int txtIdUsuario)
         {
-            string respuesta = "";
-            try
-            {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    // borrado logico del usuario
-                    Usuario oUsuario = bd.Usuario.Where(p => p.IDUSUARIO == txtIdUsuario).First();
-                    oUsuario.HABILITADO = 0;
-                    respuesta = bd.SaveChanges().ToString();
-                }
-            }catch(Exception ex)
-            {
-                respuesta = "";
-            }
+
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
+            
+            string respuesta = usuarioLogica.eliminar(txtIdUsuario);
+
             return respuesta;
         }
 
         public ActionResult CambiarContra(int idUser)
         {
-            UsuarioCLS oUsuarioCLS = new UsuarioCLS();
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
 
-            using (var bd = new BDDemoLoginEntities())
-            {
-                Usuario oUsuario = bd.Usuario.Where(p => p.IDUSUARIO == idUser).First();
-                oUsuarioCLS.idUsuario = oUsuario.IDUSUARIO;
-                oUsuarioCLS.nombreUsuario = oUsuario.NOMBREUSUARIO;
+            Usuario_CLS oUsuario_CLS = usuarioLogica.cambioContraGet(idUser);
 
-            }
-                return View(oUsuarioCLS);
+            return View(oUsuario_CLS);
         }
 
         [HttpPost]
-        public ActionResult CambiarContra(UsuarioCLS oUsuarioCLS)
+        public ActionResult CambiarContra(Usuario_CLS oUsuario_CLS)
         {
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
 
             int numRegistroEncontrados = 0;
             SHA256Managed sha = new SHA256Managed();
-            byte[] byteContra = Encoding.Default.GetBytes(oUsuarioCLS.contra);
+            byte[] byteContra = Encoding.Default.GetBytes(oUsuario_CLS.contra);
             byte[] byteContraCifrada = sha.ComputeHash(byteContra);
             string cadenContraCifrada = BitConverter.ToString(byteContraCifrada).Replace("-", "");
 
-            using (var bd = new BDDemoLoginEntities())
-            {
-                numRegistroEncontrados = bd.Usuario.Where(p => p.IDUSUARIO == oUsuarioCLS.idUsuario && p.CONTRA == cadenContraCifrada).Count();
-            }
+            numRegistroEncontrados = usuarioLogica.RegistrosEncontradosContra(oUsuario_CLS.idUsuario, cadenContraCifrada);
 
             string mensaje = "";
-            if (!ModelState.IsValid || numRegistroEncontrados == 0 || oUsuarioCLS.nuevaContra != oUsuarioCLS.confirmaContra
-                || (oUsuarioCLS.nuevaContra == null && oUsuarioCLS.confirmaContra == null))
+            if (!ModelState.IsValid || numRegistroEncontrados == 0 || oUsuario_CLS.nuevaContra != oUsuario_CLS.confirmaContra
+                || (oUsuario_CLS.nuevaContra == null && oUsuario_CLS.confirmaContra == null))
             {
+                mensaje += "<ul class='list-group'><li  class='text-danger' style='list-style:none;'>Error</li>";
                 var query = (from state in ModelState.Values
                              from error in state.Errors
                              select error.ErrorMessage).ToList();
@@ -449,43 +171,43 @@ namespace PruebaLogin.Controllers
                 {
                     mensaje += "<li class='text-danger' style='list-style:none;'>" + item + "</li>";
                 }
-                if (numRegistroEncontrados == 0)mensaje += "<li class='text-danger' style='list-style:none;'>La contraseña actual no es correcta</li>";
-                if (oUsuarioCLS.nuevaContra != oUsuarioCLS.confirmaContra) mensaje += "<li class='text-danger' style='list-style:none;'>La contraseña nueva y la confirmación son diferentes</li>";
-                if(oUsuarioCLS.nuevaContra == null && oUsuarioCLS.confirmaContra == null) mensaje += "<li class='text-danger' style='list-style:none;'>Debe ingresar la nueva contraseña y la confirmación</li>";
+
+                if (numRegistroEncontrados == 0) mensaje += "<li class='text-danger' style='list-style:none;'>La contraseña actual no es correcta</li>";
+                if (oUsuario_CLS.nuevaContra != oUsuario_CLS.confirmaContra) mensaje += "<li class='text-danger' style='list-style:none;'>La contraseña nueva y la confirmación son diferentes</li>";
+                if (oUsuario_CLS.nuevaContra == null && oUsuario_CLS.confirmaContra == null) mensaje += "<li class='text-danger' style='list-style:none;'>Debe ingresar la nueva contraseña y la confirmación</li>";
                 mensaje += "</ul'>";
-                oUsuarioCLS.mensajeError = mensaje;
-                return View(oUsuarioCLS);
+                oUsuario_CLS.mensajeError = mensaje;
+                return View(oUsuario_CLS);
+
             }
             else
             {
-                // actualizo la contraseña
-                using (var bd = new BDDemoLoginEntities())
+                int respuesta = usuarioLogica.cambioContraPost(oUsuario_CLS);
+                if (respuesta == 1)
                 {
-                    Usuario oUsuario = bd.Usuario.Where(p => p.IDUSUARIO == oUsuarioCLS.idUsuario).First();
-                    SHA256Managed shaN = new SHA256Managed();
-                    byte[] byteContraN = Encoding.Default.GetBytes(oUsuarioCLS.nuevaContra);
-                    byte[] byteContraCifradaN = shaN.ComputeHash(byteContraN);
-                    string cadenContraCifradaN = BitConverter.ToString(byteContraCifradaN).Replace("-", "");
-                    oUsuario.CONTRA = cadenContraCifradaN;
-                    bd.SaveChanges();
+                    Session["Usuario"] = null;
+                    return RedirectToAction("../Login/Index");
                 }
+                else
+                {
+                    mensaje = "Ocurrio un error, no se cambio la conrtaseña";
+                    oUsuario_CLS.mensajeError = mensaje;
+                    return View(oUsuario_CLS);
+                }
+
             }
-            Session["Usuario"] = null;
-            return RedirectToAction("../Login/Index");
         }
 
         public JsonResult RecuperarDatos(int titulo)
         {
-            UsuarioCLS oUsuarioCLS = new UsuarioCLS();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                Usuario oUsuario = bd.Usuario.Where(p => p.IDUSUARIO == titulo).First();
-                oUsuarioCLS.idUsuario = oUsuario.IDUSUARIO;
-                oUsuarioCLS.nombreUsuario = oUsuario.NOMBREUSUARIO;
-                oUsuarioCLS.email = oUsuario.EMAIL;
-                oUsuarioCLS.idGrupo = (int)oUsuario.IDGRUPO;
-            }
-            return Json(oUsuarioCLS, JsonRequestBehavior.AllowGet);
+
+            Usuario_CLS oUsuario_CLS = new Usuario_CLS();
+
+            UsuarioLogica usuarioLogica = new UsuarioLogica();
+
+            oUsuario_CLS = usuarioLogica.recuperarUsuario(titulo);
+
+            return Json(oUsuario_CLS, JsonRequestBehavior.AllowGet);
         }
     }
 }

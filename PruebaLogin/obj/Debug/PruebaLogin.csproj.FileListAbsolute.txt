@@ -298,3 +298,12 @@ C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\System.Diagnostics.
 C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\System.Reflection.Metadata.xml
 C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\System.Text.Encodings.Web.xml
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\DTO.dll
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\Logica.dll
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\DTO.pdb
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\Logica.pdb
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\Persistencia.dll
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\DTO.dll.config
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\Logica.dll.config
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\Persistencia.pdb
+C:\Users\These\Documents\ejemplo\PruebaLogin\PruebaLogin\bin\Persistencia.dll.config

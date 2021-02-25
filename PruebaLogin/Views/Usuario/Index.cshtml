@@ -1,6 +1,7 @@
 ﻿@using PruebaLogin.Models;
+@using DTO;
 @using PruebaLogin.ClasesAuxiliares;
-@model  PaginadorGenerico<UsuarioCLS>
+@model  PaginadorGenericoL<Usuario_CLS>
 @{
     ViewBag.Title = "Index";
     List<SelectListItem> listaGrupo = (List<SelectListItem>)ViewBag.listaGrupo;
@@ -159,7 +160,7 @@
     }
 
     function Guardar(respuesta) {
-        if (respuesta == "1" || respuesta == "0"){
+        if (respuesta == "1" || respuesta == "0") {
             document.getElementById("contenidoAviso").classList = "modal-content";
             document.getElementById("descripcionAviso").classList = "text-body";
             document.getElementById("descripcionAviso").innerHTML = "EL usuario se guardo correctamente";

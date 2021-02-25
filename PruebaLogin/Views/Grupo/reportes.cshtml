@@ -1,8 +1,9 @@
 ﻿@using PruebaLogin.Models;
-@model GrupoCLS
+@using DTO;
+@model Grupo_CLS
 @{
     ViewBag.Title = "reportes";
-    List<GrupoCLS> lista = (List<GrupoCLS>)ViewBag.listaGrupo;
+    List<Grupo_CLS> lista = (List<Grupo_CLS>)ViewBag.listaGrupo;
 }
 
 <h2>Reporte: Grupo por cantidad de permisos</h2>
@@ -11,7 +12,7 @@
 @using (Ajax.BeginForm("gruposAgraficar", "Grupo", null, new AjaxOptions
 {
     HttpMethod = "POST",
-    OnSuccess = "generarGraficar",
+    OnSuccess = "generarGrafica",
     UpdateTargetId = "divError"
 }, new { id = "frmBuscarGrupos", name = "frmBuscarGrupos" }))
 {
@@ -54,12 +55,12 @@
 
     var seleccionarTodo = document.getElementById("seleccionarTodo");
     seleccionarTodo.onclick = function () {
-        document.getElementById("btn-graficar").disabled = false;
-        document.getElementById("seleccionarTodo").disabled = true;
-        for (i = 0; i < document.frmBuscarGrupos.elements.length; i++)
-            if (document.frmBuscarGrupos.elements[i].type == "checkbox")
-                if (document.frmBuscarGrupos.elements[i].name == "grupoParaGraficar")
-                    document.frmBuscarGrupos.elements[i].checked = 1
+    document.getElementById("btn-graficar").disabled = false;
+    document.getElementById("seleccionarTodo").disabled = true;
+    for (i = 0; i < document.frmBuscarGrupos.elements.length; i++)
+        if (document.frmBuscarGrupos.elements[i].type == "checkbox")
+            if (document.frmBuscarGrupos.elements[i].name == "grupoParaGraficar")
+                document.frmBuscarGrupos.elements[i].checked = 1
     }
 
     var seleccionarNada = document.getElementById("seleccionarNada");
@@ -96,7 +97,7 @@
 
     ///////////////  grafica solo la lista de seleccionados
 
-    function generarGraficar(lista) {
+    function generarGrafica(lista) {
         // Carga la API de visualización de google chart y el paquete corechart.
         google.charts.load('current', { 'packages': ['corechart'] });
 

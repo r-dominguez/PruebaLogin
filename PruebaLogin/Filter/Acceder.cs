@@ -1,4 +1,5 @@
-﻿using PruebaLogin.Models;
+﻿using DTO;
+using PruebaLogin.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace PruebaLogin.Filter
         public override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             var usuario = HttpContext.Current.Session["Usuario"];
-            List<MenuCLS> permisos = (List<MenuCLS>)HttpContext.Current.Session["Permiso"];
+            List<Menu_CLS> permisos = (List<Menu_CLS>)HttpContext.Current.Session["Permiso"];
 
             string controlador = filterContext.ActionDescriptor.ControllerDescriptor.ControllerName;
             string accion = filterContext.ActionDescriptor.ActionName;

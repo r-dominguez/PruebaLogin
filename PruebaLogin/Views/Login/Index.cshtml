@@ -1,5 +1,6 @@
 ﻿@using PruebaLogin.Models;
-@model UsuarioCLS
+@using DTO;
+@model Usuario_CLS
 
 @{
     Layout = null;
@@ -129,7 +130,7 @@
     <script>
         document.getElementById("email").value = "demo@demo.net"
         function Recuperar(respuesta) {
-            if (respuesta == 1) {
+            if (respuesta == "1") {
                 document.getElementById("error").innerHTML = "";
                 alert("Se envió una nueva contraseña a su cuenta de correo");
                 document.getElementById("btnClose").click();
@@ -150,7 +151,7 @@
 
     <script src="~/Scripts/jquery-3.4.1.min.js"></script>
     <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
-    <script src="~/Scripts/bootstrap.min.js"></script>  
+    <script src="~/Scripts/bootstrap.min.js"></script>
 </body>
 
 </html>

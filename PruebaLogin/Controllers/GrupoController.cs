@@ -13,6 +13,8 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
 using PruebaLogin.ClasesAuxiliares;
+using Logica;
+using DTO;
 
 namespace PruebaLogin.Controllers
 {
@@ -22,207 +24,50 @@ namespace PruebaLogin.Controllers
         public FileResult generarExcel()
         {
             byte[] buffer;
-            using (MemoryStream ms = new MemoryStream())
-            {
-                //doc excel 
-                ExcelPackage ep = new ExcelPackage();
-                // definir hoja de excel 
-                ep.Workbook.Worksheets.Add("Reporte de Grupos");
-                //agrega hoja al documento
-                var currentSheet = ep.Workbook.Worksheets;
-                var ew = currentSheet.First();
-                // definir nombres de las columnas 
-                ew.Cells[1, 1].Value = "Id Grupo";
-                ew.Cells[1, 2].Value = "Nombre Grupo";
-                ew.Cells[1, 3].Value = "Cant Permisos";
-                ew.Column(1).Width = 10;
-                ew.Column(2).Width = 30;
-                ew.Column(3).Width = 10;
-                using (var range = ew.Cells[1, 1, 1, 3])
-                {
-                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    range.Style.Font.Color.SetColor(Color.White);
-                    range.Style.Fill.BackgroundColor.SetColor(Color.DarkRed);
-                }
-                // recuperar la lista desde la session
-                List<GrupoCLS> lista = (List<GrupoCLS>)Session["listaGrupo"];
-                int nregistros = lista.Count();
-                //recorrer la lista y cargar los datos en las celdas
-                for (int i = 0; i < nregistros; i++)
-                {
-                    ew.Cells[i + 2, 1].Value = lista[i].idGrupo;
-                    ew.Cells[i + 2, 2].Value = lista[i].nombreGrupo;
-                    ew.Cells[i + 2, 3].Value = cantPermisos(lista[i].idGrupo);
-                }
-                ep.SaveAs(ms);
-                buffer = ms.ToArray();
 
-            }
+            // recuperar la lista desde la session
+            List<Grupo_CLS> lista = (List<Grupo_CLS>)Session["listaGrupo"];
+
+            GrupoLogica grupoLogica = new GrupoLogica();
+            buffer = grupoLogica.datosArchivoExcel(lista);
+
             return File(buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
-
-        public int cantPermisos(int id)
-        {
-            int nPermisos = 0;
-            using (var bd = new BDDemoLoginEntities())
-            {
-                nPermisos = bd.GrupoPermiso.Where(p => p.IDGRUPO == id ).Count();
-            }
-            return nPermisos;
-        }
-
 
         // GET: Grupo 
         public ActionResult Index(int pagina = 1)
         {
-            List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
 
-            PaginadorGenerico<GrupoCLS> _PaginadorGrupos;
-            int _RegistrosPorPagina = 4;
-            int _TotalRegistros = 0;
+            GrupoLogica grupoLogica = new GrupoLogica();
 
-            using (var bd = new BDDemoLoginEntities())
-            {
-                listaGrupo = (from grupo in bd.Grupo
-                              where grupo.HABILITADO == 1
-                              select new GrupoCLS
-                              {
-                                  idGrupo = grupo.IDGRUPO,
-                                  nombreGrupo = grupo.NOMBREGRUPO
-                              }).OrderBy(p => p.nombreGrupo)
-                                .Skip((pagina - 1) * _RegistrosPorPagina)
-                                .Take(_RegistrosPorPagina)
-                                .ToList();
+            PaginadorGenericoL<Grupo_CLS> _PaginadorGrupos = new PaginadorGenericoL<Grupo_CLS>();
+            _PaginadorGrupos = grupoLogica.listaCompletaPaginada(pagina);
 
-                _TotalRegistros = bd.Grupo.Where(p => p.HABILITADO == 1).Count();
+            // sesion con listado de usuario para los archivos pdf y excel
+            // el nomUsuario va vacio porque se usa un mismo metodo para listado completo y filtrado
+            string nomGrupo = "";
+            Session["listaGrupo"] = grupoLogica.listadoParaArchivos(nomGrupo);
 
-                // Número total de páginas de la tabla Customers
-                var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
-                // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
-                _PaginadorGrupos = new PaginadorGenerico<GrupoCLS>()
-                {
-                    RegistrosPorPagina = _RegistrosPorPagina,
-                    TotalRegistros = _TotalRegistros,
-                    TotalPaginas = _TotalPaginas,
-                    PaginaActual = pagina,
-                    Resultado = listaGrupo
-                };
-                // sesion con listado de usuario para los archivos pdf y excel
-                string nomUsuario = "";
-                Session["listaGrupo"] = listaParaArchivos(nomUsuario);
-            }
             return View(_PaginadorGrupos);
         }
 
         public ActionResult Filtrar(string nombregrupo, int pagina = 1)
         {
-           string nomGrupo = nombregrupo;
-            List<GrupoCLS> listaGrupo = new List<GrupoCLS>();
 
-            PaginadorGenerico<GrupoCLS> _PaginadorGrupos;
-            int _RegistrosPorPagina = 4;
-            int _TotalRegistros = 0;
+            GrupoLogica grupoLogica = new GrupoLogica();
+            PaginadorGenericoL<Grupo_CLS> _PaginadorGrupos = new PaginadorGenericoL<Grupo_CLS>();
+            _PaginadorGrupos = grupoLogica.listaFiltradaPaginada(nombregrupo, pagina);
 
-            using (var bd = new BDDemoLoginEntities())
-            {
-                if (nomGrupo == null)
-                {
-                    listaGrupo = (from grupo in bd.Grupo
-                                  where grupo.HABILITADO == 1
-                                  select new GrupoCLS
-                                  {
-                                      idGrupo = grupo.IDGRUPO,
-                                      nombreGrupo = grupo.NOMBREGRUPO
-                                  }).OrderBy(p => p.nombreGrupo)
-                                .Skip((pagina - 1) * _RegistrosPorPagina)
-                                .Take(_RegistrosPorPagina)
-                                .ToList();
+            // sesion con listado de usuario para los archivos pdf y excel
+            Session["listaGrupo"] = grupoLogica.listadoParaArchivos(nombregrupo);
 
-                    _TotalRegistros = bd.Grupo.Where(p => p.HABILITADO == 1).Count();
-
-                    // Número total de páginas de la tabla Customers
-                    var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
-                    // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
-                    _PaginadorGrupos = new PaginadorGenerico<GrupoCLS>()
-                    {
-                        RegistrosPorPagina = _RegistrosPorPagina,
-                        TotalRegistros = _TotalRegistros,
-                        TotalPaginas = _TotalPaginas,
-                        PaginaActual = pagina,
-                        Resultado = listaGrupo
-                    };
-                }
-                else
-                {
-                    listaGrupo = (from grupo in bd.Grupo
-                                  where grupo.HABILITADO == 1
-                                  && grupo.NOMBREGRUPO.Contains(nomGrupo)
-                                  select new GrupoCLS
-                                  {
-                                      idGrupo = grupo.IDGRUPO,
-                                      nombreGrupo = grupo.NOMBREGRUPO
-                                  }).OrderBy(p => p.nombreGrupo)
-                                .Skip((pagina - 1) * _RegistrosPorPagina)
-                                .Take(_RegistrosPorPagina)
-                                .ToList();
-
-                    _TotalRegistros = bd.Grupo.Where(p => p.HABILITADO == 1
-                                                    && p.NOMBREGRUPO.Contains(nomGrupo)).Count();
-
-                    // Número total de páginas de la tabla Customers
-                    var _TotalPaginas = (int)Math.Ceiling((double)_TotalRegistros / _RegistrosPorPagina);
-                    // Instanciamos la 'Clase de paginación' y asignamos los nuevos valores
-                    _PaginadorGrupos = new PaginadorGenerico<GrupoCLS>()
-                    {
-                        RegistrosPorPagina = _RegistrosPorPagina,
-                        TotalRegistros = _TotalRegistros,
-                        TotalPaginas = _TotalPaginas,
-                        PaginaActual = pagina,
-                        Resultado = listaGrupo
-                    };
-                }
-                // sesion con listado de grupo para los archivos pdf y excel
-                Session["listaGrupo"] = listaParaArchivos(nomGrupo);
-            }
             return PartialView("_TablaGrupo", _PaginadorGrupos);
         }
 
 
-        public List<GrupoCLS> listaParaArchivos(string filtro)
+        public string Guardar(Grupo_CLS oGrupo_CLS, int titulo, FormCollection form)
         {
-            List<GrupoCLS> lista = new List<GrupoCLS>();
-            if (filtro == null)
-            {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    lista = (from grupo in bd.Grupo
-                             where grupo.HABILITADO == 1
-                             select new GrupoCLS
-                             {
-                                 idGrupo = grupo.IDGRUPO,
-                                 nombreGrupo = grupo.NOMBREGRUPO
-                             }).ToList();
-                }
-            }
-            else
-            {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    lista = (from grupo in bd.Grupo
-                             where grupo.HABILITADO == 1
-                             && grupo.NOMBREGRUPO.Contains(filtro)
-                             select new GrupoCLS
-                             {
-                                 idGrupo = grupo.IDGRUPO,
-                                 nombreGrupo = grupo.NOMBREGRUPO
-                             }).ToList();
-                }
-            }
-            return lista;
-        }
-
-        public string Guardar(GrupoCLS oGrupoCLS, int titulo, FormCollection form)
-        {
+            GrupoLogica grupoLogica = new GrupoLogica();
             string respuesta = "";
             // validar que haya seleccionado permisos
             string[] permisosSeleccionados = null;
@@ -234,12 +79,8 @@ namespace PruebaLogin.Controllers
             int numPermisosSeleccionados = 0;
             if (permisosSeleccionados != null) numPermisosSeleccionados = permisosSeleccionados.Count();
 
-            int numRegistrosEncontrados = 0;
-            using (var bd = new BDDemoLoginEntities())
-            {
-                numRegistrosEncontrados = bd.Grupo.Where(p => p.NOMBREGRUPO == oGrupoCLS.nombreGrupo
-                && p.IDGRUPO != oGrupoCLS.idGrupo).Count();
-            }
+            int numRegistrosEncontrados = grupoLogica.RegistrosEncontrados(oGrupo_CLS.nombreGrupo, oGrupo_CLS.idGrupo);;
+
             if (!ModelState.IsValid || numRegistrosEncontrados >= 1 || numPermisosSeleccionados < 1)
             {
                 // revisar errores del modelo 
@@ -259,229 +100,65 @@ namespace PruebaLogin.Controllers
             }
             else
             {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    using (var transaccion = new System.Transactions.TransactionScope())
-                    {
-                        if (titulo == -1) 
-                        {
-                            //guardar
-                            Grupo oGrupo = new Grupo();
-                            oGrupo.NOMBREGRUPO = oGrupoCLS.nombreGrupo;
-                            oGrupo.HABILITADO = 1;
-                            bd.Grupo.Add(oGrupo);
+                respuesta = grupoLogica.guardar(oGrupo_CLS, titulo, permisosSeleccionados);
 
-                            for (int i = 0; i < numPermisosSeleccionados; i++)
-                            {
-                                GrupoPermiso oGrupoPermiso = new GrupoPermiso();
-                                oGrupoPermiso.IDGRUPO = oGrupo.IDGRUPO;
-                                oGrupoPermiso.IDPERMISO = int.Parse(permisosSeleccionados[i]);
-                                oGrupoPermiso.HABILITADO = 1;
-                                bd.GrupoPermiso.Add(oGrupoPermiso);
-                            }
-                            respuesta = bd.SaveChanges().ToString();
-                            transaccion.Complete();
-                            if (respuesta == "0") respuesta = "";
-                            else respuesta = "999";
-                        }
-                        else
-                        {
-                            //editar
-                            Grupo oGrupo = bd.Grupo.Where(p => p.IDGRUPO == oGrupoCLS.idGrupo).First();
-                            oGrupo.NOMBREGRUPO = oGrupoCLS.nombreGrupo;
-
-                            // borra permisos existentes
-                            bd.GrupoPermiso.RemoveRange(bd.GrupoPermiso.Where(p => p.IDGRUPO == oGrupoCLS.idGrupo));
-
-                            // agregar nuevos permisos
-
-                            for (int i = 0; i < numPermisosSeleccionados; i++)
-                            {
-                                GrupoPermiso oGrupoPermiso = new GrupoPermiso();
-                                oGrupoPermiso.IDGRUPO = oGrupoCLS.idGrupo;
-                                oGrupoPermiso.IDPERMISO = int.Parse(permisosSeleccionados[i]);
-                                oGrupoPermiso.HABILITADO = 1;
-                                bd.GrupoPermiso.Add(oGrupoPermiso);
-                            }
-                            respuesta = bd.SaveChanges().ToString();
-                            transaccion.Complete();
-                            if (respuesta == "0") respuesta = "";
-                            else respuesta = "999";
-                        }
-                    }
-
-                }
+                if (respuesta == "0") respuesta = "";
+                else respuesta = "999";
             }
-                return respuesta;
+         return respuesta;
         }
 
-        public void listarPermisoSelecionados(List<GrupoPermisoCLS> listaPermisosGrupo)
-        {
-            int[] sListaPermisosGrupo = new int[listaPermisosGrupo.Count()];
-
-            for (int i = 0 ; i < listaPermisosGrupo.Count(); i++) {
-                sListaPermisosGrupo[i] = listaPermisosGrupo[i].idPermiso;
-            }
-            List<PermisoCLS> listaPermisoCLS = new List<PermisoCLS>();
-
-            using (var bd = new BDDemoLoginEntities())
-            {
-                listaPermisoCLS = (from permiso in bd.Permiso
-                                   where permiso.HABILITADO == 1
-                                   select new PermisoCLS
-                                   {
-                                       idPermiso = permiso.IDPERMISO,
-                                       nombrePagina = permiso.NOMBREPAGINA
-                                   }).ToList();
-                ViewBag.listaPermiso = new MultiSelectList(listaPermisoCLS, "idPermiso", "nombrePagina", sListaPermisosGrupo);
-            }
-        }
-
-        // recupero los permisos de un grupo 
-        public List<GrupoPermisoCLS> listaPermisosGrupo(int idgrupo)
-        {
-            List<GrupoPermisoCLS> lista = new List<GrupoPermisoCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                lista = (from grupopermiso in bd.GrupoPermiso
-                         join permiso in bd.Permiso
-                         on grupopermiso.IDPERMISO equals permiso.IDPERMISO
-                         where grupopermiso.IDGRUPO == idgrupo
-                         select new GrupoPermisoCLS
-                         {
-                             idPermiso = (int)grupopermiso.IDPERMISO,
-                             nombrePagina = permiso.NOMBREPAGINA
-                         }).ToList();
-
-            }
-            return (lista);
-        }
-
-        public String Eliminar(int? txtIdGrupo)
+        public String Eliminar(int txtIdGrupo)
         {
             string respuesta = "";
-            try
-            {
-                using (var bd = new BDDemoLoginEntities())
-                {
-                    using (var transaccion = new System.Transactions.TransactionScope())
-                    {
-                        // borrado logico del grupo
-                        Grupo oGrupo = bd.Grupo.Where(p => p.IDGRUPO == txtIdGrupo).First();
-                        oGrupo.HABILITADO = 0;
 
-                        // borra permisos existentes
-                        bd.GrupoPermiso.RemoveRange(bd.GrupoPermiso.Where(p => p.IDGRUPO == txtIdGrupo));
+            GrupoLogica grupoLogica = new GrupoLogica();
+            respuesta = grupoLogica.eliminar(txtIdGrupo);
 
-                        respuesta = bd.SaveChanges().ToString();
-                        transaccion.Complete();
-                        if (respuesta == "0") respuesta = "";
-                        else respuesta = "999";
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                respuesta = "";
-            }
             return respuesta;
         }
 
         public JsonResult RecuperarDatosGrupo(int titulo)
         {
-            GrupoCLS oGrupoCLS = new GrupoCLS();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                Grupo oGrupo = bd.Grupo.Where(p => p.IDGRUPO == titulo).First();
-                oGrupoCLS.idGrupo = oGrupo.IDGRUPO;
-                oGrupoCLS.nombreGrupo = oGrupo.NOMBREGRUPO;
-            }
-            return Json(oGrupoCLS, JsonRequestBehavior.AllowGet);
+            Grupo_CLS oGrupo_CLS = new Grupo_CLS();
+
+            GrupoLogica grupoLogica = new GrupoLogica();
+
+            oGrupo_CLS = grupoLogica.RecuperarDatosGrupo(titulo);
+
+            return Json(oGrupo_CLS, JsonRequestBehavior.AllowGet);
         }
 
 
         public JsonResult RecuperarPermisoDisponibles()
         {
             List<SelectListItem> lista = new List<SelectListItem>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                lista = (from permiso in bd.Permiso
-                         where permiso.HABILITADO == 1
-                         select new SelectListItem
-                         { 
-                             Text = permiso.NOMBREPAGINA,
-                             Value = permiso.IDPERMISO.ToString()
 
-                         }).ToList();
-            }
-                return Json(lista, JsonRequestBehavior.AllowGet);
+            GrupoLogica grupoLogica = new GrupoLogica();
+
+            lista = grupoLogica.RecuperarPermisoDisponibles();
+
+            return Json(lista, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult RecuperarDatosGrupoPermisoSinAsignar(int titulo)
         {
-            List<PermisoCLS> listaP = new List<PermisoCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                listaP = (from permiso in bd.Permiso
-                         where permiso.HABILITADO == 1
-                         select new PermisoCLS
-                         {
-                             idPermiso = permiso.IDPERMISO,
-                             nombrePagina = permiso.NOMBREPAGINA
-                         }).ToList();
-
-            }
-            List<GrupoPermisoCLS> listagp = new List<GrupoPermisoCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                listagp = (from grupopermiso in bd.GrupoPermiso
-                         join grupo in bd.Grupo
-                         on grupopermiso.IDGRUPO equals grupo.IDGRUPO
-                         where grupo.IDGRUPO == titulo
-                         select new GrupoPermisoCLS
-                         {
-                             idPermiso = (int)grupopermiso.IDPERMISO,
-                             idGrupo = (int)grupopermiso.IDGRUPO,
-                             idGrupoPermiso = grupopermiso.IDGRUPOPERMISO
-                         }).ToList();
-            }
             List<SelectListItem> lista = new List<SelectListItem>();
-            foreach (PermisoCLS p in listaP)
-            {
-                int cantSi = 0;
-                foreach(GrupoPermisoCLS gp in listagp)
-                {
-                    if (p.idPermiso == gp.idPermiso)
-                    {
-                        cantSi += 1;
-                    }
-                }
-                if (cantSi == 0)
-                {
-                    string text = p.nombrePagina;
-                    string value = p.idPermiso.ToString();
-                    lista.Insert(0, new SelectListItem { Text = text, Value = value });
-                }
-            }
+
+            GrupoLogica grupoLogica = new GrupoLogica();
+            lista = grupoLogica.RecuperarDatosGrupoPermisoSinAsignar(titulo);
+
             return Json(lista, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult RecuperarDatosGrupoPermiso(int titulo)
         {
-            List<SelectListItem> lista;
-            using (var bd = new BDDemoLoginEntities())
-            {
+            List<SelectListItem> lista = new List<SelectListItem>();
 
-                lista = (from grupopermiso in bd.GrupoPermiso
-                         join permiso in bd.Permiso
-                         on grupopermiso.IDPERMISO equals permiso.IDPERMISO
-                         where grupopermiso.IDGRUPO == titulo
-                         select new SelectListItem
-                         {
-                             Text = permiso.NOMBREPAGINA,
-                             Value = permiso.IDPERMISO.ToString()
-                         }).ToList();
-            }
+            GrupoLogica grupoLogica = new GrupoLogica();
+
+            lista = grupoLogica.RecuperarDatosGrupoPermiso(titulo);
+
             return Json(lista, JsonRequestBehavior.AllowGet);
         }
 
@@ -491,83 +168,38 @@ namespace PruebaLogin.Controllers
             return View();
         }
 
-
         public JsonResult gruposAgraficar(int[] grupoParaGraficar)
         {
-            int[] arregloGrupoParaGraficar = grupoParaGraficar;
-            List<GrupoCLS> listaEnBase = new List<GrupoCLS>();
-            List<GrupoCLS> lista = new List<GrupoCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                listaEnBase = (from grupo in bd.Grupo
-                         where grupo.HABILITADO == 1
-                               select new GrupoCLS
-                         {
-                             idGrupo = grupo.IDGRUPO,
-                             nombreGrupo = grupo.NOMBREGRUPO
-                         }).ToList();
-            }
-            for (int i = 0; i < listaEnBase.Count(); i++)
-            {
-                listaEnBase[i].cantPermisos = cantPermisos(listaEnBase[i].idGrupo);
+            List<Grupo_CLS> lista = new List<Grupo_CLS>();
+            GrupoLogica grupoLogica = new GrupoLogica();
 
-            }
-     
-            foreach (var item in listaEnBase)
-            {
-                for (int i = 0; i < arregloGrupoParaGraficar.Length; i++)
-                {
-                    if (item.idGrupo == arregloGrupoParaGraficar[i])
-                    {
-                        lista.Insert(0, item);
-                    }
-                }
-            }
+            lista = grupoLogica.gruposAgraficar(grupoParaGraficar);
 
-            var listaOrdenada = lista.OrderBy(p => p.nombreGrupo).ToList();
-            return Json(listaOrdenada, JsonRequestBehavior.AllowGet);
+
+            return Json(lista, JsonRequestBehavior.AllowGet);
         }
-
 
         // lista grupos y cantidad de permisos por grupo para graficar
         public JsonResult recuperarCantPermisosGrupo()
         {
-            List<GrupoCLS> lista = new List<GrupoCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                lista = (from grupo in bd.Grupo
-                         where grupo.HABILITADO == 1
-                         select new GrupoCLS
-                         {
-                             idGrupo = grupo.IDGRUPO,
-                             nombreGrupo = grupo.NOMBREGRUPO
-                         }).ToList();
-            }
-            for (int i= 0;i < lista.Count();i++)
-            {
-                lista[i].cantPermisos = cantPermisos(lista[i].idGrupo);
+            List<Grupo_CLS> lista = new List<Grupo_CLS>();
 
-            }
-                return Json(lista, JsonRequestBehavior.AllowGet);
+            GrupoLogica grupoLogica = new GrupoLogica();
+
+            lista = grupoLogica.recuperarCantPermisosGrupo();
+
+            return Json(lista, JsonRequestBehavior.AllowGet);
         }
-
+        
         // viewbag de grupos activos
         public void listarGruposActivos()
         {
-            List<GrupoCLS> lista = new List<GrupoCLS>();
-            using (var bd = new BDDemoLoginEntities())
-            {
-                lista = (from grupo in bd.Grupo
-                         where grupo.HABILITADO == 1
-                         select new GrupoCLS
-                         {
-                             idGrupo = grupo.IDGRUPO,
-                             nombreGrupo = grupo.NOMBREGRUPO
-                         }).ToList();
-                ViewBag.listaGrupo = lista;
-            }
+            List<Grupo_CLS> lista = new List<Grupo_CLS>();
 
+            GrupoLogica grupoLogica = new GrupoLogica();
+            lista = grupoLogica.listarGruposActivos();
+
+            ViewBag.listaGrupo = lista;
         }
-
     }
 }

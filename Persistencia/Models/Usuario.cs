@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Persistencia.Models
+namespace Persistencia.MODELS
 {
     using System;
     using System.Collections.Generic;

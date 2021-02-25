@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="BDDemoLoginModelStoreContainer" CdmEntityContainer="BDLoginDemoEntities">
+    <EntitySetMapping Name="Grupo">
+      <EntityTypeMapping TypeName="BDDemoLoginModel.Grupo">
+        <MappingFragment StoreEntitySet="Grupo">
+          <ScalarProperty Name="IDGRUPO" ColumnName="IDGRUPO" />
+          <ScalarProperty Name="NOMBREGRUPO" ColumnName="NOMBREGRUPO" />
+          <ScalarProperty Name="HABILITADO" ColumnName="HABILITADO" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GrupoPermiso">
+      <EntityTypeMapping TypeName="BDDemoLoginModel.GrupoPermiso">
+        <MappingFragment StoreEntitySet="GrupoPermiso">
+          <ScalarProperty Name="IDGRUPOPERMISO" ColumnName="IDGRUPOPERMISO" />
+          <ScalarProperty Name="IDGRUPO" ColumnName="IDGRUPO" />
+          <ScalarProperty Name="IDPERMISO" ColumnName="IDPERMISO" />
+          <ScalarProperty Name="HABILITADO" ColumnName="HABILITADO" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Permiso">
+      <EntityTypeMapping TypeName="BDDemoLoginModel.Permiso">
+        <MappingFragment StoreEntitySet="Permiso">
+          <ScalarProperty Name="IDPERMISO" ColumnName="IDPERMISO" />
+          <ScalarProperty Name="NOMBREPAGINA" ColumnName="NOMBREPAGINA" />
+          <ScalarProperty Name="NOMBREACCION" ColumnName="NOMBREACCION" />
+          <ScalarProperty Name="NOMBRECONTROLADOR" ColumnName="NOMBRECONTROLADOR" />
+          <ScalarProperty Name="HABILITADO" ColumnName="HABILITADO" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Usuario">
+      <EntityTypeMapping TypeName="BDDemoLoginModel.Usuario">
+        <MappingFragment StoreEntitySet="Usuario">
+          <ScalarProperty Name="IDUSUARIO" ColumnName="IDUSUARIO" />
+          <ScalarProperty Name="NOMBREUSUARIO" ColumnName="NOMBREUSUARIO" />
+          <ScalarProperty Name="CONTRA" ColumnName="CONTRA" />
+          <ScalarProperty Name="EMAIL" ColumnName="EMAIL" />
+          <ScalarProperty Name="IDGRUPO" ColumnName="IDGRUPO" />
+          <ScalarProperty Name="HABILITADO" ColumnName="HABILITADO" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

@@ -182,7 +182,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="BDDemoLoginEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="BDLoginDemoEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Grupo" EntityType="Self.Grupo" />
           <EntitySet Name="GrupoPermiso" EntityType="Self.GrupoPermiso" />
           <EntitySet Name="Permiso" EntityType="Self.Permiso" />
@@ -205,7 +205,7 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="BDDemoLoginModelStoreContainer" CdmEntityContainer="BDDemoLoginEntities">
+        <EntityContainerMapping StorageEntityContainer="BDDemoLoginModelStoreContainer" CdmEntityContainer="BDLoginDemoEntities">
           <EntitySetMapping Name="Grupo">
             <EntityTypeMapping TypeName="BDDemoLoginModel.Grupo">
               <MappingFragment StoreEntitySet="Grupo">

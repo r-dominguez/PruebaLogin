@@ -1,6 +1,7 @@
 ﻿@using PruebaLogin.Models;
+@using DTO;
 @using PruebaLogin.ClasesAuxiliares;
-@model  PaginadorGenerico<GrupoCLS>
+@model  PaginadorGenericoL<Grupo_CLS>
 @{
     ViewBag.Title = "Index";
     //MultiSelectList listaPermiso = (MultiSelectList)ViewBag.listaPermiso;
@@ -12,7 +13,7 @@
     <button type="button" onclick="Agregar()" class="btn btn-primary" data-toggle="modal" data-target="#modalAgregar">
         Nuevo Grupo
     </button>
-    
+
     @Html.ActionLink("Listado XSLX", "generarExcel", "Grupo", null, new { @class = "btn btn-primary bi bi-download", @target = "_blank" })
     @Html.ActionLink("Reporte: grupos X cantidad de permisos", "Reportes", "Grupo", null, new { @class = "btn btn-primary", @target = "_blank" })
 </div>

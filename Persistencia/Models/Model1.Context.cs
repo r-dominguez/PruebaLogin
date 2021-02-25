@@ -7,16 +7,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Persistencia.Models
+namespace Persistencia.MODELS
 {
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class BDDemoLoginEntities : DbContext
+    public partial class BDLoginDemoEntities : DbContext
     {
-        public BDDemoLoginEntities()
-            : base("name=BDDemoLoginEntities")
+        public BDLoginDemoEntities()
+            : base("name=BDLoginDemoEntities")
         {
         }
     

@@ -1,5 +1,6 @@
 ﻿@using PruebaLogin.Models;
-@model UsuarioCLS
+@using DTO;
+@model Usuario_CLS
 @{
     ViewBag.Title = "CambiarContra";
     string mensajeError = "";
@@ -41,7 +42,7 @@
 
             <input id="msjError" type="text" style="visibility:hidden;" value="@mensajeError" />
 
-            <div id="divError" class="list-group-item-danger"></div>
+            <div id="divError"></div>
 
             <div style="padding-top:1em;">
                 <!-- Button trigger modal -->
